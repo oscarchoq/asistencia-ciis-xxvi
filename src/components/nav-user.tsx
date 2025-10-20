@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { logout } from "@/actions"
 
 export function NavUser({
   user,
@@ -90,8 +91,10 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup> */}
             <DropdownMenuItem>
-              <LogOut />
-              Log out
+              <button onClick={ () => logout() } className="flex items-center gap-5 w-full cursor-pointer">
+                <LogOut />
+                Log out
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

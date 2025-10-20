@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  administrador
+  organizador
+  asistencia
+}
+
 model Plan {
   id_plan      String   @id @default(uuid())
   denominacion String
@@ -31,15 +37,6 @@ model MetodoPago {
   Inscripcion Inscripcion[]
 }
 
-model Rol {
-  id_rol       String   @id @default(uuid())
-  denominacion String
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-
-  Usuario Usuario[]
-}
-
 model Persona {
   id_persona        String   @id @default(uuid())
   correo_formulario String?
@@ -54,7 +51,6 @@ model Persona {
   eliminado         Boolean  @default(false)
 
   Inscripcion Inscripcion[]
-  Usuario Usuario[]
 }
 
 model Inscripcion {
@@ -75,27 +71,23 @@ model Inscripcion {
   plan       Plan       @relation(fields: [id_plan], references: [id_plan])
   metodoPago MetodoPago @relation(fields: [id_metodo_pago], references: [id_metodo_pago])
 
-
   Asistencia Asistencia[]
-  Kit Kit[]
+  Kit        Kit[]
 
   @@unique([id_persona, id_plan]) // Evitar que una persona se inscriba mas de una vez
 }
 
 model Usuario {
   id_usuario String   @id @default(uuid())
-  id_persona String
-  id_rol     String
-  username   String   @unique
+  correo     String   @unique
   password   String
+  name       String
+  role       Role     @default(organizador)
   activo     Boolean  @default(true)
   createdAt  DateTime @default(now())
 
-  persona Persona @relation(fields: [id_persona], references: [id_persona])
-  rol    Rol     @relation(fields: [id_rol], references: [id_rol])
-
   Asistencia Asistencia[]
-  Kit Kit[]
+  Kit        Kit[]
 }
 
 model Evento {
@@ -118,12 +110,12 @@ model Asistencia {
   fecha_asistencia DateTime @default(now()) @db.Date()
   hora_asistencia  DateTime @default(now()) @db.Time()
   activo           Boolean  @default(true)
-  id_usuario   String
+  id_usuario       String
   createdAt        DateTime @default(now())
 
-  inscripcion Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
-  evento     Evento      @relation(fields: [id_evento], references: [id_evento])
-  registrado_por   Usuario     @relation(fields: [id_usuario], references: [id_usuario])
+  inscripcion    Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
+  evento         Evento      @relation(fields: [id_evento], references: [id_evento])
+  registrado_por Usuario     @relation(fields: [id_usuario], references: [id_usuario])
 
   @@unique([id_inscripcion, id_evento]) // Evitar que una persona marque asistencia mas de una vez por evento
 }
@@ -138,8 +130,8 @@ model Kit {
   id_usuario     String
   createdAt      DateTime @default(now())
 
-  inscripcion Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
-  entregado_por   Usuario     @relation(fields: [id_usuario], references: [id_usuario])
+  inscripcion   Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
+  entregado_por Usuario     @relation(fields: [id_usuario], references: [id_usuario])
 
   @@unique([id_inscripcion]) // Evitar que una persona reciba mas de un kit
 }
