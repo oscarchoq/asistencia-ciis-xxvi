@@ -4,17 +4,16 @@ import { initialData } from './seedData';
 async function main() {
   console.log("Seed database");
 
+  await prisma.usuario.deleteMany();
   await prisma.plan.deleteMany();
   await prisma.metodoPago.deleteMany();
-  await prisma.rol.deleteMany();
 
-  const { rol, plan, metodoPago } = initialData;
+  const { plan, metodoPago, users } = initialData;
 
-  // 1. Crear roles
-  const rolData = rol.map(denominacion => ({ denominacion }));
-  await prisma.rol.createManyAndReturn({
-    data: rolData
-  });
+  // 1. Usuarios
+  await prisma.usuario.createMany({
+    data: users
+  })
 
   // 2. Crear plan
   const planData = plan.map(denominacion => ({ denominacion }));
