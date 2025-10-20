@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Plan {
+  id_plan      String   @id @default(uuid())
+  denominacion String
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  Inscripcion Inscripcion[]
+}
+
+model MetodoPago {
+  id_metodo_pago String   @id @default(uuid())
+  denominacion   String
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  Inscripcion Inscripcion[]
+}
+
+model Rol {
+  id_rol       String   @id @default(uuid())
+  denominacion String
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  Usuario Usuario[]
+}
+
+model Persona {
+  id_persona        String   @id @default(uuid())
+  correo_formulario String?
+  correo            String
+  nombres           String
+  apellidos         String
+  numeroDocumento   String
+  celular           String?
+  pais              String?
+  universidad       String?
+  createdAt         DateTime @default(now())
+  eliminado         Boolean  @default(false)
+
+  Inscripcion Inscripcion[]
+  Usuario Usuario[]
+}
+
+model Inscripcion {
+  id_inscripcion      String    @id @default(uuid())
+  id_persona          String
+  id_plan             String
+  id_metodo_pago      String
+  pago_validado       Boolean   @default(false)
+  fecha_pago_validado DateTime?
+  link_voucher        String?
+  link_matricula      String?
+  link_fotocheck      String?
+  observaciones       String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  persona    Persona    @relation(fields: [id_persona], references: [id_persona])
+  plan       Plan       @relation(fields: [id_plan], references: [id_plan])
+  metodoPago MetodoPago @relation(fields: [id_metodo_pago], references: [id_metodo_pago])
+
+
+  Asistencia Asistencia[]
+  Kit Kit[]
+
+  @@unique([id_persona, id_plan]) // Evitar que una persona se inscriba mas de una vez
+}
+
+model Usuario {
+  id_usuario String   @id @default(uuid())
+  id_persona String
+  id_rol     String
+  username   String   @unique
+  password   String
+  activo     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  persona Persona @relation(fields: [id_persona], references: [id_persona])
+  rol    Rol     @relation(fields: [id_rol], references: [id_rol])
+
+  Asistencia Asistencia[]
+  Kit Kit[]
+}
+
+model Evento {
+  id_evento    String   @id @default(uuid())
+  denominacion String
+  descripcion  String?
+  fecha_evento DateTime @db.Date()
+  hora_inicio  DateTime @db.Time()
+  hora_fin     DateTime @db.Time()
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  Asistencia Asistencia[]
+}
+
+model Asistencia {
+  id_asistencia    String   @id @default(uuid())
+  id_inscripcion   String
+  id_evento        String
+  fecha_asistencia DateTime @default(now()) @db.Date()
+  hora_asistencia  DateTime @default(now()) @db.Time()
+  activo           Boolean  @default(true)
+  id_usuario   String
+  createdAt        DateTime @default(now())
+
+  inscripcion Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
+  evento     Evento      @relation(fields: [id_evento], references: [id_evento])
+  registrado_por   Usuario     @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([id_inscripcion, id_evento]) // Evitar que una persona marque asistencia mas de una vez por evento
+}
+
+model Kit {
+  id_kit         String   @id @default(uuid())
+  id_inscripcion String
+  entregado      Boolean  @default(false)
+  fecha_entrega  DateTime @default(now()) @db.Date()
+  observaciones  String?
+  activo         Boolean  @default(true)
+  id_usuario     String
+  createdAt      DateTime @default(now())
+
+  inscripcion Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
+  entregado_por   Usuario     @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@unique([id_inscripcion]) // Evitar que una persona reciba mas de un kit
+}
