@@ -7,12 +7,12 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
 
-  // const session = await auth()
-  // console.log(session)
+  const session = await auth()
+  console.log(session)
 
-  // if ( session?.user ) {
-  //   redirect('/')
-  // }
+  if ( session?.user ) {
+    redirect('/')
+  }
 
   return (
     <main className="flex justify-center">

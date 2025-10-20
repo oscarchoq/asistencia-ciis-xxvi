@@ -2,12 +2,22 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { DynamicBreadcrumb } from "@/components/dynamic-breadcrumb";
+import { auth } from "@/auth.config";
+import { redirect } from "next/navigation";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const session = await auth()
+  console.log(session)
+
+  if (!session?.user) {
+    redirect('/auth/login')
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

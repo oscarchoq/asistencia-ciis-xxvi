@@ -8,6 +8,10 @@ export const authConfig: NextAuthConfig = {
   pages: {
     signIn: '/auth/login',
   },
+  session: {
+    strategy: 'jwt',
+    maxAge: 6 * 60 * 60, // 6 horas de session
+  },
   callbacks: {
 
     // TODO: PARA PROTEGER RUTAS (FORMA CON MIDDLEWARE)
@@ -56,10 +60,20 @@ export const authConfig: NextAuthConfig = {
         console.log({email, password})
 
         // Buscar correo
+        const user = await prisma.usuario.findUnique({
+          where: { correo: email.toLowerCase() }
+        })
+        if (!user) return null;
+
         // comparar las contrasenas
-        // regresar el usuario
-        
-        return null;
+        if (!bcryptjs.compareSync(password, user.password)) return null
+
+        // regresar el usuario sin psw
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password: _, ...rest } = user
+        console.log({ rest })
+        return rest;
+
       }
     })
   ],
