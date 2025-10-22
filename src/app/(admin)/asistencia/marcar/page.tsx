@@ -1,8 +1,45 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Swal from "sweetalert2";
+
+// Tipos para evitar `any`
+type Corner = { x: number; y: number };
+
+interface BarcodeDetectionLike {
+  rawValue?: string;
+  cornerPoints?: Corner[];
+  boundingBox?: { x: number; y: number; width: number; height: number };
+}
+
+interface Detector {
+  detect(
+    source: HTMLCanvasElement | OffscreenCanvas
+  ): Promise<BarcodeDetectionLike[]>;
+}
+
+type JsQRResult = {
+  data: string;
+  location?: {
+    topLeftCorner: Corner;
+    topRightCorner: Corner;
+    bottomRightCorner: Corner;
+    bottomLeftCorner: Corner;
+  };
+} | null;
+
+declare global {
+  interface Window {
+    jsQR?: (
+      data: Uint8ClampedArray,
+      width: number,
+      height: number
+    ) => JsQRResult;
+    BarcodeDetector?:
+      | { new (options?: { formats?: string[] }): Detector }
+      | undefined;
+  }
+}
 
 export default function QRScannerPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -22,12 +59,16 @@ export default function QRScannerPage() {
         audio: false,
       });
       setStream(s);
-    } catch (err: any) {
-      setError(err?.message || "No se pudo acceder a la cámara");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : String(err) || "No se pudo acceder a la cámara"
+      );
     }
   };
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (!stream) return;
     stream.getTracks().forEach((t) => t.stop());
     setStream(null);
@@ -44,20 +85,17 @@ export default function QRScannerPage() {
           overlayRef.current.height
         );
     }
-  };
+  }, [stream]);
 
   const resetScanner = () => {
-    // Mostrar SweetAlert de éxito
     Swal.fire({
       title: "¡Éxito!",
       icon: "success",
       confirmButtonText: "Aceptar",
     });
 
-    // Limpiar contenido
     setDecodedText(null);
 
-    // Limpiar canvas
     if (overlayRef.current) {
       const ctx = overlayRef.current.getContext("2d");
       if (ctx)
@@ -76,19 +114,25 @@ export default function QRScannerPage() {
 
   useEffect(() => {
     if (!stream) return;
-    const video = videoRef.current!;
-    const overlay = overlayRef.current!;
+    const video = videoRef.current;
+    const overlay = overlayRef.current;
+
+    if (!video || !overlay) return;
+
     const offscreen = document.createElement("canvas");
     const offCtx = offscreen.getContext("2d")!;
     const ovCtx = overlay.getContext("2d")!;
-    let detector: any = null;
+    let detector: Detector | null = null;
     let jsqrLoaded = false;
     let stopped = false;
     runningRef.current = true;
 
     const loadJsQR = () =>
       new Promise<void>((resolve, reject) => {
-        if ((window as any).jsQR) return resolve();
+        if (window.jsQR) {
+          jsqrLoaded = true;
+          return resolve();
+        }
         const s = document.createElement("script");
         s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js";
         s.async = true;
@@ -110,7 +154,7 @@ export default function QRScannerPage() {
     const drawDetected = (
       raw: string,
       corners?: Array<{ x: number; y: number }>,
-      bb?: any
+      bb?: { x: number; y: number; width: number; height: number } | undefined
     ) => {
       ovCtx.clearRect(0, 0, overlay.width, overlay.height);
       ovCtx.drawImage(video, 0, 0, overlay.width, overlay.height);
@@ -151,13 +195,13 @@ export default function QRScannerPage() {
 
       let detected = false;
 
-      if ((window as any).BarcodeDetector) {
+      if (window.BarcodeDetector) {
         try {
           if (!detector)
-            detector = new (window as any).BarcodeDetector({
+            detector = new window.BarcodeDetector!({
               formats: ["qr_code"],
-            });
-          const results: Array<any> = await detector.detect(offscreen);
+            }) as unknown as Detector;
+          const results = await detector.detect(offscreen);
           if (results.length) {
             const r = results[0];
             const raw = r.rawValue ?? "";
@@ -165,7 +209,9 @@ export default function QRScannerPage() {
             drawDetected(raw, r.cornerPoints, r.boundingBox);
             detected = true;
           }
-        } catch {}
+        } catch {
+          // ignore detection errors and continue loop
+        }
       } else {
         try {
           if (!jsqrLoaded) await loadJsQR();
@@ -175,11 +221,8 @@ export default function QRScannerPage() {
             offscreen.width,
             offscreen.height
           );
-          const res = (window as any).jsQR?.(
-            imgData.data,
-            imgData.width,
-            imgData.height
-          );
+          const res =
+            window.jsQR?.(imgData.data, imgData.width, imgData.height) ?? null;
           if (res) {
             setDecodedText(res.data ?? "");
             const loc = res.location;
@@ -193,8 +236,12 @@ export default function QRScannerPage() {
             else drawDetected(res.data);
             detected = true;
           }
-        } catch (e: any) {
-          setError(e?.message || "Error en detección fallback (jsQR).");
+        } catch (e) {
+          setError(
+            e instanceof Error
+              ? e.message
+              : String(e) || "Error en detección fallback (jsQR)."
+          );
           runningRef.current = false;
           stopped = true;
         }
@@ -210,12 +257,14 @@ export default function QRScannerPage() {
       runningRef.current = false;
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [stream]);
+  }, [stream, stopCamera]);
 
   useEffect(() => {
+    const videoElement = videoRef.current;
+
     return () => {
-      if (videoRef.current?.srcObject)
-        (videoRef.current.srcObject as MediaStream)
+      if (videoElement?.srcObject)
+        (videoElement.srcObject as MediaStream)
           .getTracks()
           .forEach((t) => t.stop());
       runningRef.current = false;
