@@ -2,15 +2,13 @@
 
 import prisma from "@/lib/prisma";
 
-export const getPlanes = async () => {
+export const getInscripciones = async () => {
   try {
-    const planes = await prisma.plan.findMany({
-      where: { activo: true },
-    });
+    const inscripciones = await prisma.inscripcion.findMany();
     
     return {
       ok: true,
-      planes: planes,
+      inscripciones: inscripciones,
     }
   } catch (error) {
       console.log(error)
