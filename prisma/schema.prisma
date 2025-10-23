@@ -19,62 +19,51 @@ enum Role {
   asistencia
 }
 
-model Plan {
-  id_plan      String   @id @default(uuid())
-  denominacion String
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-
-  Inscripcion Inscripcion[]
+enum PaymentMethod {
+  yape
+  bcp
+  efectivo
+  otros
 }
 
-model MetodoPago {
-  id_metodo_pago String   @id @default(uuid())
-  denominacion   String
-  activo         Boolean  @default(true)
-  createdAt      DateTime @default(now())
-
-  Inscripcion Inscripcion[]
+enum PlanType {
+  profesionales
+  estudiantes
+  delegaciones
+  docenteesis
+  estudianteesis
 }
 
-model Persona {
-  id_persona        String   @id @default(uuid())
-  correo_formulario String?
-  correo            String
-  nombres           String
-  apellidos         String
-  numeroDocumento   String
-  celular           String?
-  pais              String?
-  universidad       String?
-  createdAt         DateTime @default(now())
-  eliminado         Boolean  @default(false)
-
-  Inscripcion Inscripcion[]
+enum InscriptionType {
+  virtual
+  presencial
 }
 
 model Inscripcion {
-  id_inscripcion      String    @id @default(uuid())
-  id_persona          String
-  id_plan             String
-  id_metodo_pago      String
-  pago_validado       Boolean   @default(false)
+  id_inscripcion      String          @id @default(uuid())
+  correo_formulario   String?
+  correo              String
+  nombres             String
+  apellidos           String
+  numero_documento    String          @unique
+  celular             String
+  pais                String?
+  universidad         String?
+  plan                PlanType
+  metodo_pago         PaymentMethod
+  pago_validado       Boolean         @default(false)
   fecha_pago_validado DateTime?
   link_voucher        String?
   link_matricula      String?
   link_fotocheck      String?
   observaciones       String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-
-  persona    Persona    @relation(fields: [id_persona], references: [id_persona])
-  plan       Plan       @relation(fields: [id_plan], references: [id_plan])
-  metodoPago MetodoPago @relation(fields: [id_metodo_pago], references: [id_metodo_pago])
+  email_enviado       Boolean         @default(false)
+  tipo_inscripcion    InscriptionType @default(virtual)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 
   Asistencia Asistencia[]
   Kit        Kit[]
-
-  @@unique([id_persona, id_plan]) // Evitar que una persona se inscriba mas de una vez
 }
 
 model Usuario {
