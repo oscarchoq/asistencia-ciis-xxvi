@@ -57,12 +57,24 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn: (row, columnId, filterValue) => {
-      // Buscar solo en las columnas de numero_documento y nombres
+      // Buscar en las columnas de numero_documento, nombres y apellidos
       const numeroDocumento = String(row.getValue("numero_documento") || "").toLowerCase();
       const nombres = String(row.getValue("nombres") || "").toLowerCase();
-      const searchValue = String(filterValue).toLowerCase();
+      const apellidos = String(row.getValue("apellidos") || "").toLowerCase();
+      const searchValue = String(filterValue).toLowerCase().trim();
       
-      return numeroDocumento.includes(searchValue) || nombres.includes(searchValue);
+      // Combinar nombre completo para búsqueda agrupada
+      const nombreCompleto = `${nombres} ${apellidos}`;
+      
+      // Si la búsqueda contiene espacios, buscar en el nombre completo
+      // De lo contrario, buscar en cada campo individualmente
+      if (searchValue.includes(" ")) {
+        return nombreCompleto.includes(searchValue) || numeroDocumento.includes(searchValue);
+      }
+      
+      return numeroDocumento.includes(searchValue) || 
+             nombres.includes(searchValue) || 
+             apellidos.includes(searchValue);
     },
     state: {
       sorting,

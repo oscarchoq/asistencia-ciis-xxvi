@@ -57,12 +57,12 @@ export function DataTableToolbar<TData>({
         )}
 
         <Input
-          placeholder="Buscar por documento o nombre..."
+          placeholder="Buscar por documento, nombres..."
           value={searchValue}
           onChange={(event) => {
             const value = event.target.value;
             setSearchValue(value);
-            // Aplicar filtro global en las columnas de número de documento y nombres
+            // Aplicar filtro global en las columnas de número de documento, nombres y apellidos
             table.setGlobalFilter(value);
           }}
           className="h-8 w-[200px] lg:w-[300px]"
@@ -86,13 +86,13 @@ export function DataTableToolbar<TData>({
       </div>
 
       <div className="flex items-center gap-2">
-        {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-          <Button variant="outline" size="sm">
+        {table.getFilteredSelectedRowModel().rows.length > 0 && (
+          <Button key="delete-button" variant="outline" size="sm">
             <TrashIcon className="mr-2 size-4" aria-hidden="true" />
             Eliminar ({table.getFilteredSelectedRowModel().rows.length})
           </Button>
-        ) : null}
-        {customAction}
+        )}
+        {customAction && <div key="custom-action">{customAction}</div>}
       </div>
     </div>
   );
