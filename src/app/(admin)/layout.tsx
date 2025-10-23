@@ -32,7 +32,7 @@ export default async function DashboardLayout({
             <DynamicBreadcrumb />
           </div>
         </header>
-        <main className="m-5">
+        <main className="m-5 lg:m-20 flex-1 overflow-auto">
           {children}
         </main>
       </SidebarInset>
