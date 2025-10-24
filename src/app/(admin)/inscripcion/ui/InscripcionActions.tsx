@@ -21,11 +21,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Inscripcion } from "@prisma/client";
+import { Inscripcion, PlanType } from "@prisma/client";
 import { MoreHorizontal, Pencil, CheckCircle, XCircle, Receipt, FileText } from "lucide-react";
 import { EditInscripcion } from "./EditInscripcion";
 import { togglePaymentStatus } from "@/actions";
 import { toast } from "sonner";
+import { ImageViewer } from "@/components/ui/image-viewer";
+
+// Mapeo de tipos de plan
+const planTypeLabels: Record<PlanType, string> = {
+  profesionales: "Profesionales",
+  estudiantes: "Estudiantes",
+  delegaciones: "Delegaciones",
+  docenteesis: "Docente ESIS",
+  estudianteesis: "Estudiante ESIS",
+};
 
 interface InscripcionActionsProps {
   inscripcion: Inscripcion;
@@ -35,6 +45,8 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAlertPayment, setOpenAlertPayment] = useState(false);
+  const [openVoucherViewer, setOpenVoucherViewer] = useState(false);
+  const [openMatriculaViewer, setOpenMatriculaViewer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const pagoValidado = inscripcion.pago_validado;
 
@@ -100,7 +112,7 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
           <DropdownMenuItem
             onClick={() => {
               if (inscripcion.link_voucher) {
-                window.open(inscripcion.link_voucher, "_blank");
+                setOpenVoucherViewer(true);
               }
             }}
             disabled={!inscripcion.link_voucher}
@@ -111,7 +123,7 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
           <DropdownMenuItem
             onClick={() => {
               if (inscripcion.link_matricula) {
-                window.open(inscripcion.link_matricula, "_blank");
+                setOpenMatriculaViewer(true);
               }
             }}
             disabled={!inscripcion.link_matricula}
@@ -154,6 +166,34 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {inscripcion.link_voucher && (
+        <ImageViewer
+          imageUrl={inscripcion.link_voucher}
+          title={`Voucher - ${inscripcion.nombres} ${inscripcion.apellidos}`}
+          open={openVoucherViewer}
+          onOpenChange={setOpenVoucherViewer}
+          type="voucher"
+          inscripcionData={{
+            id_inscripcion: inscripcion.id_inscripcion,
+            nombres: inscripcion.nombres,
+            apellidos: inscripcion.apellidos,
+            plan: planTypeLabels[inscripcion.plan],
+            pago_validado: inscripcion.pago_validado,
+          }}
+          onPaymentValidated={() => router.refresh()}
+        />
+      )}
+
+      {inscripcion.link_matricula && (
+        <ImageViewer
+          imageUrl={inscripcion.link_matricula}
+          title={`Matrícula - ${inscripcion.nombres} ${inscripcion.apellidos}`}
+          open={openMatriculaViewer}
+          onOpenChange={setOpenMatriculaViewer}
+          type="matricula"
+        />
+      )}
     </>
   );
 }
