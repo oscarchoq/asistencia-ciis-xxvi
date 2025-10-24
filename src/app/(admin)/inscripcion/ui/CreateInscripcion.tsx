@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { createInscripcion } from "@/actions";
 import { toast } from "sonner";
-import { PlanType, PaymentMethod, InscriptionType, Inscripcion } from '@prisma/client';
+import { PlanType, PaymentMethod, InscriptionType } from '@prisma/client';
 import clsx from "clsx";
 
 interface FormData {
