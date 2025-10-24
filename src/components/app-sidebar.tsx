@@ -10,6 +10,7 @@ import {
   Package,
   UserPlus,
   Users,
+  Calendar,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -67,6 +68,11 @@ const navMainData = [
     title: "Inscripcion",
     url: "/inscripcion",
     icon: UserPlus,
+  },
+  {
+    title: "Eventos",
+    url: "/evento",
+    icon: Calendar,
   },
   {
     title: "Usuarios",
