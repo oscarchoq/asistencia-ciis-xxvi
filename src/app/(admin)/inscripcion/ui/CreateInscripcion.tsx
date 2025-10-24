@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -24,7 +25,8 @@ import {
 } from "@/components/ui/select";
 import { createInscripcion } from "@/actions";
 import { toast } from "sonner";
-import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import { PlanType, PaymentMethod, InscriptionType, Inscripcion } from '@prisma/client';
+import clsx from "clsx";
 
 interface FormData {
   correo: string;
@@ -37,9 +39,10 @@ interface FormData {
   tipo_inscripcion: InscriptionType;
   pais?: string;
   universidad?: string;
+  observaciones?: string;
 }
 
-export function CreateInscripcionDialog() {
+export function CreateInscripcion() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +66,7 @@ export function CreateInscripcionDialog() {
       tipo_inscripcion: "presencial",
       pais: "",
       universidad: "",
+      observaciones: "",
     },
   });
 
@@ -118,6 +122,7 @@ export function CreateInscripcionDialog() {
         tipo_inscripcion: data.tipo_inscripcion,
         pais: data.pais?.trim() || undefined,
         universidad: data.universidad?.trim() || undefined,
+        observaciones: data.observaciones?.trim() || undefined,
       });
 
       toast.dismiss();
@@ -145,7 +150,7 @@ export function CreateInscripcionDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Nueva Inscripción</Button>
+        <Button className="btn-primary">Nueva Inscripción</Button>
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
@@ -175,14 +180,10 @@ export function CreateInscripcionDialog() {
                     validate: (value) =>
                       value.trim().length > 0 ||
                       "Los nombres no pueden estar vacíos",
-                    minLength: {
-                      value: 2,
-                      message: "Los nombres deben tener al menos 2 caracteres",
-                    },
                   })}
                 />
                 {errors.nombres && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-xs text-red-500">
                     {errors.nombres.message}
                   </p>
                 )}
@@ -201,14 +202,10 @@ export function CreateInscripcionDialog() {
                     validate: (value) =>
                       value.trim().length > 0 ||
                       "Los apellidos no pueden estar vacíos",
-                    minLength: {
-                      value: 2,
-                      message: "Los apellidos deben tener al menos 2 caracteres",
-                    },
                   })}
                 />
                 {errors.apellidos && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-xs text-red-500">
                     {errors.apellidos.message}
                   </p>
                 )}
@@ -242,7 +239,7 @@ export function CreateInscripcionDialog() {
                   })}
                 />
                 {errors.numero_documento && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-xs text-red-500">
                     {errors.numero_documento.message}
                   </p>
                 )}
@@ -272,7 +269,7 @@ export function CreateInscripcionDialog() {
                   })}
                 />
                 {errors.celular && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-xs text-red-500">
                     {errors.celular.message}
                   </p>
                 )}
@@ -301,7 +298,7 @@ export function CreateInscripcionDialog() {
                 })}
               />
               {errors.correo && (
-                <p className="text-sm text-red-500">{errors.correo.message}</p>
+                <p className="text-xs text-red-500">{errors.correo.message}</p>
               )}
             </div>
 
@@ -332,6 +329,27 @@ export function CreateInscripcionDialog() {
             {/* Fila 5: Plan, Tipo y Método de Pago */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
+                <Label htmlFor="tipo_inscripcion">
+                  Tipo Inscripción<span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={tipo_inscripcion}
+                  onValueChange={(value) =>
+                    setValue("tipo_inscripcion", value as InscriptionType, {
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="presencial">Presencial</SelectItem>
+                    <SelectItem value="virtual">Virtual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="plan">
                   Plan <span className="text-red-500">*</span>
                 </Label>
@@ -352,27 +370,6 @@ export function CreateInscripcionDialog() {
                     <SelectItem value="estudianteesis">
                       Estudiante ESIS
                     </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tipo_inscripcion">
-                  Tipo <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={tipo_inscripcion}
-                  onValueChange={(value) =>
-                    setValue("tipo_inscripcion", value as InscriptionType, {
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="presencial">Presencial</SelectItem>
-                    <SelectItem value="virtual">Virtual</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -400,6 +397,25 @@ export function CreateInscripcionDialog() {
                 </Select>
               </div>
             </div>
+
+            {/* Observaciones */}
+            <div className="space-y-2">
+              <Label htmlFor="observaciones">
+                Observaciones <span className="text-muted-foreground text-xs">(Opcional)</span>
+              </Label>
+              <Textarea
+                id="observaciones"
+                placeholder="Ingresa observaciones adicionales..."
+                className="w-full resize-none"
+                rows={3}
+                {...register("observaciones")}
+              />
+              {errors.observaciones && (
+                <p className="text-xs text-red-500">
+                  {errors.observaciones.message}
+                </p>
+              )}
+            </div>
           </div>
 
           <DialogFooter>
@@ -414,7 +430,17 @@ export function CreateInscripcionDialog() {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" disabled={isLoading} 
+              className={
+                clsx(
+                  "ml-2", 
+                  {
+                    // 'btn-secondary': !isLoading,
+                    'btn-disabled': isLoading
+                  }
+                )}
+              >
               {isLoading ? "Creando..." : "Crear Inscripción"}
             </Button>
           </DialogFooter>

@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 
 interface CreateInscripcionInput {
   correo: string;
@@ -14,10 +15,16 @@ interface CreateInscripcionInput {
   tipo_inscripcion: InscriptionType;
   pais?: string;
   universidad?: string;
+  observaciones?: string;
 }
 
 export const createInscripcion = async (data: CreateInscripcionInput) => {
   try {
+    // Normalizar y capitalizar los datos
+    const correoNormalizado = normalizeEmail(data.correo);
+    const nombresCapitalizados = capitalizeName(data.nombres);
+    const apellidosCapitalizados = capitalizeName(data.apellidos);
+    
     // Validar que el número de documento no exista
     const existingInscripcion = await prisma.inscripcion.findUnique({
       where: {
@@ -35,16 +42,17 @@ export const createInscripcion = async (data: CreateInscripcionInput) => {
     // Crear la inscripción
     const inscripcion = await prisma.inscripcion.create({
       data: {
-        correo: data.correo,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        numero_documento: data.numero_documento,
-        celular: data.celular,
+        correo: correoNormalizado,
+        nombres: nombresCapitalizados,
+        apellidos: apellidosCapitalizados,
+        numero_documento: data.numero_documento.trim(),
+        celular: data.celular.trim(),
         plan: data.plan,
         metodo_pago: data.metodo_pago,
         tipo_inscripcion: data.tipo_inscripcion,
-        pais: data.pais,
-        universidad: data.universidad,
+        pais: data.pais?.trim() || undefined,
+        universidad: data.universidad?.trim() || undefined,
+        observaciones: data.observaciones?.trim() || undefined,
         pago_validado: false,
         email_enviado: false,
       },

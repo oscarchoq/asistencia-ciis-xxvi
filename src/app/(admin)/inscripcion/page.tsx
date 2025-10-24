@@ -2,8 +2,8 @@ import { Title } from '@/components/ui/title/Title'
 import { DataTable } from '@/components/data-table/data-table'
 import { columns } from './columns'
 import { getInscripciones } from '@/actions/inscripcion/get-inscripciones'
-import { SyncButton } from './SyncButton'
-import { CreateInscripcionDialog } from './CreateInscripcionDialog'
+import { SyncButton } from './ui/SyncButton'
+import { CreateInscripcion } from './ui/CreateInscripcion'
 
 export default async function InscripcionesPage() {
   const { ok, inscripciones } = await getInscripciones()
@@ -24,7 +24,7 @@ export default async function InscripcionesPage() {
       <Title title='Inscripciones' />
 
       <div className='flex justify-between items-center mb-5'>
-        <CreateInscripcionDialog />
+        <CreateInscripcion />
       </div>
 
       <div className='mb-10'>
