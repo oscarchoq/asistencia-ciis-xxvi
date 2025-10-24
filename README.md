@@ -1,19 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is an assistance system for the CIIS via QR for internal control
 
 ## Getting Started
 
-Instalar dependencias:
+Install dependencies:
 ```bash
-npm install --legacy-peer-deps
+npm install
 ```
 
-Correr el proyecto
+Run the project
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
+```
+
+## Development
+.env
+```bash
+# Environment variables for email configuration
+EMAIL_HOST=""
+EMAIL_USER=""
+EMAIL_PASS=""
+
+# Environment variables for database configuration
+DATABASE_URL=
+
+# Environment variable for authentication secret
+AUTH_SECRET=
+```
+
+## production
+.env
+```bash
+# Environment variables for email configuration
+EMAIL_HOST=""
+EMAIL_USER=""
+EMAIL_PASS=""
+
+# Environment variables for database configuration
+DATABASE_URL=
+
+# Environment variable for authentication secret
+AUTH_SECRET=
+NEXTAUTH_URL=
+NEXTAUTH_URL_INTERNAL=
+AUTH_TRUST_HOST=
+```
+
+## Docker
+```bash
+docker build -t [NAME] .
+docker run -d --name [NAME] -p PORTEXTERNO:PORTINTERNO --env-file .env [NAME]
 ```
