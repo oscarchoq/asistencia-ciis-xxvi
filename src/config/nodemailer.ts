@@ -24,6 +24,13 @@ export interface SendMailParams {
   to: string,
   name: string,
   subject: string,
+  html?: string,
+  attachments?: {
+    filename: string;
+    content: Buffer | string;
+    contentType?: string;
+    cid?: string;
+  }[];
 }
 
 // function getRegistrationEmailHtml(name: string): string {
@@ -31,17 +38,17 @@ export interface SendMailParams {
 // }
 
 
-export async function sendMail({to, name, subject}: SendMailParams) {
+export async function sendMail({ to, name, subject, html, attachments }: SendMailParams) {
 
-  // const htmlContent = getRegistrationEmailHtml(name);
+  const htmlContent = html || `<p>Hola ${name}, este es un correo de prueba.</p>`;
 
-  const htmlContent = `<p>Hola ${name}, este es un correo de prueba.</p>`;
-
-  const mailOptions = {
+  const mailOptions: nodemailer.SendMailOptions = {
     from: `"CIIS Tacna" <${email}>`,
     to,
     subject,
     html: htmlContent,
+    attachments: attachments || undefined,
   };
+
   return await transporter.sendMail(mailOptions);
 }

@@ -3,7 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
-import { Inscripcion, PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import {
+  Inscripcion,
+  PlanType,
+  PaymentMethod,
+  InscriptionType,
+} from "@prisma/client";
 import { InscripcionActions } from "./ui/InscripcionActions";
 
 // Mapeo de tipos de plan
@@ -37,6 +42,15 @@ export const columns: ColumnDef<Inscripcion>[] = [
     ),
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("numero_documento")}</div>
+    ),
+  },
+  {
+    accessorKey: "correo",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Correo" />
+    ),
+    cell: ({ row }) => (
+      <div className="min-w-[150px]">{row.getValue("correo")}</div>
     ),
   },
   {
@@ -119,6 +133,20 @@ export const columns: ColumnDef<Inscripcion>[] = [
     cell: ({ row }) => {
       const inscripcion = row.original;
       return <InscripcionActions inscripcion={inscripcion} />;
+    },
+  },
+  {
+    accessorKey: "email_enviado",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email Enviado" />
+    ),
+    cell: ({ row }) => {
+      const enviado = row.getValue("email_enviado") as boolean;
+      return (
+        <Badge variant={enviado ? "default" : "secondary"}>
+          {enviado ? "Enviado" : "No Enviado"}
+        </Badge>
+      );
     },
   },
 ];
