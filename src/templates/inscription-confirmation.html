@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Language" content="es">
+  <title>Confirmación de Inscripción - CIIS XXVI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .banner img {
+      width: 100%;
+      display: block;
+    }
+
+    .content {
+      padding: 30px;
+      color: #333333;
+      line-height: 1.6;
+    }
+
+    .content h2 {
+      margin-top: 0;
+      color: #1e3c72;
+      text-transform: capitalize;
+    }
+
+    .links {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #444444;
+    }
+
+    .links a {
+      color: #2a5298;
+      text-decoration: none;
+    }
+
+    .notice {
+      font-size: 12px;
+      color: #777;
+      margin-top: 25px;
+      background: #fafafa;
+      padding: 10px 12px;
+      border-left: 3px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .notice a {
+      color: #1e3c72;
+      text-decoration: none;
+    }
+
+    .footer {
+      background: #f1f1f1;
+      text-align: center;
+      font-size: 12px;
+      color: #666666;
+      padding: 15px;
+    }
+
+    .footer a {
+      color: #1e3c72;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Banner -->
+    <div class="banner">
+      <img src="https://res.cloudinary.com/dnz4gqdqw/image/upload/v1761440818/ciistacna2025_cover_k0ftag.jpg"
+        alt="Banner CIIS">
+    </div>
+
+    <!-- Contenido -->
+    <div class="content">
+      <h2>Hola, {{name}} 🎉</h2>
+      <p>
+        Nos complace informarte que hemos <b>validado tu pago correctamente</b> y tu inscripción al
+        <b>Congreso Internacional de Informática y Sistemas XXVI</b> ha sido <b>confirmada con éxito</b>.
+      </p>
+      <p>
+        A continuación encontrarás tu <b>código QR personal</b>, el cual deberás presentar al momento de ingresar:
+      </p>
+
+      <!-- QR -->
+      <div style="text-align:center; margin-top:25px;">
+        <img src="{{qrImage}}" alt="Código QR"
+          style="width:150px; height:150px;" />
+        <p style="font-size:13px; color:#555;">Preséntalo al ingresar al evento</p>
+      </div>
+
+      <p style="margin-top:25px;">
+        ¡Te esperamos en esta nueva edición del CIIS para compartir conocimiento, innovación y tecnología!
+        No olvides seguirnos en nuestros canales oficiales para estar al tanto de todas las novedades:
+      </p>
+
+      <div class="links">
+        🌐 Sitio web: <a href="https://ciistacna.com" target="_blank">ciistacna.com</a><br>
+        📘 Facebook: <a href="https://www.facebook.com/ciistacna" target="_blank">facebook.com/ciistacna</a>
+      </div>
+
+      <!-- Aviso automático -->
+      <div class="notice">
+        Este es un mensaje automático, por favor no respondas a este correo.
+        Si tienes alguna duda, escríbenos al
+        <a href="mailto:ciistacna@unjbg.edu.pe">ciistacna@unjbg.edu.pe</a> o al
+        <a href="tel:+51921066567">+51 921 066 567</a>.
+      </div>
+    </div>
+
+    <!-- Pie -->
+    <div class="footer">
+      © 2025 CIIS Tacna. Todos los derechos reservados.
+    </div>
+  </div>
+</body>
+
+</html>
