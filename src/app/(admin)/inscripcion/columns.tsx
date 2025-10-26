@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import {
   Inscripcion,
@@ -37,45 +36,35 @@ const inscriptionTypeLabels: Record<InscriptionType, string> = {
 export const columns: ColumnDef<Inscripcion>[] = [
   {
     accessorKey: "numero_documento",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="N° Documento" />
-    ),
+    header: "N° Documento",
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue("numero_documento")}</div>
     ),
   },
   // {
   //   accessorKey: "correo",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Correo" />
-  //   ),
+  //   header: "Correo",
   //   cell: ({ row }) => (
   //     <div className="min-w-[150px]">{row.getValue("correo")}</div>
   //   ),
   // },
   {
     accessorKey: "nombres",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Nombres" />
-    ),
+    header: "Nombres",
     cell: ({ row }) => (
       <div className="min-w-[150px]">{row.getValue("nombres")}</div>
     ),
   },
   {
     accessorKey: "apellidos",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Apellidos" />
-    ),
+    header: "Apellidos",
     cell: ({ row }) => (
       <div className="min-w-[150px]">{row.getValue("apellidos")}</div>
     ),
   },
   {
     accessorKey: "plan",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Plan" />
-    ),
+    header: "Plan",
     cell: ({ row }) => {
       const plan = row.getValue("plan") as PlanType;
       return <Badge variant="outline">{planTypeLabels[plan]}</Badge>;
@@ -86,9 +75,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
   },
   {
     accessorKey: "metodo_pago",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Método Pago" />
-    ),
+    header: "Método Pago",
     cell: ({ row }) => {
       const metodo = row.getValue("metodo_pago") as PaymentMethod;
       return <Badge variant="outline">{paymentMethodLabels[metodo]}</Badge>
@@ -96,9 +83,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
   },
   {
     accessorKey: "tipo_inscripcion",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tipo Inscripción" />
-    ),
+    header: "Tipo Inscripción",
     cell: ({ row }) => {
       const tipo = row.getValue("tipo_inscripcion") as InscriptionType;
       return (
@@ -110,9 +95,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
   },
   {
     accessorKey: "pago_validado",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Estado Pago" />
-    ),
+    header: "Estado Pago",
     cell: ({ row }) => {
       const validado = row.getValue("pago_validado") as boolean;
       return (

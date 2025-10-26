@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
+import { revalidatePath } from "next/cache";
 
 interface UpdateInscripcionInput {
   id_inscripcion: string;
@@ -75,6 +76,9 @@ export const updateInscripcion = async (data: UpdateInscripcionInput) => {
         observaciones: data.observaciones?.trim() || undefined,
       },
     });
+
+    // revalidatePath("/");
+    revalidatePath("/inscripcion", 'page');
 
     return {
       ok: true,

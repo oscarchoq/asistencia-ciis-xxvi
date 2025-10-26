@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
+import { revalidatePath } from "next/cache";
 
 interface CreateInscripcionInput {
   correo: string;
@@ -57,6 +58,9 @@ export const createInscripcion = async (data: CreateInscripcionInput) => {
         email_enviado: false,
       },
     });
+
+    revalidatePath("/")
+    revalidatePath("/inscripcion", "page");
 
     return {
       ok: true,

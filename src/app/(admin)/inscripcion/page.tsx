@@ -1,3 +1,5 @@
+export const revalidate = 0; // Desactivar caché de Next.js
+
 import { columns } from "./columns";
 import { CreateInscripcion } from "./ui/CreateInscripcion";
 import { DataTable } from "@/components/data-table/data-table";
@@ -43,32 +45,30 @@ interface InscripcionesPageProps {
 
 export default async function InscripcionesPage({ searchParams }: InscripcionesPageProps) {
   const resolvedSearchParams = await searchParams;
-  
+
   const page = Number(resolvedSearchParams.page) || 1;
   const pageSize = Number(resolvedSearchParams.pageSize) || 5; // ← Default: 5 registros
-  
+
   // Solo enviar parámetros si existen
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params: any = {
     page: page,
     pageSize: pageSize,
   };
-  
+
   if (resolvedSearchParams.documento) {
     params.documento = resolvedSearchParams.documento;
   }
-  
+
   if (resolvedSearchParams.pago_validado) {
     params.pago_validado = resolvedSearchParams.pago_validado;
   }
-  
+
   if (resolvedSearchParams.tipo_inscripcion) {
     params.tipo_inscripcion = resolvedSearchParams.tipo_inscripcion;
   }
-  
-  const result = await getInscripcionesPaginated(params);
 
-  console.log(result)
+  const result = await getInscripcionesPaginated(params);
 
   if (!result.ok) {
     return (
@@ -84,7 +84,7 @@ export default async function InscripcionesPage({ searchParams }: InscripcionesP
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
-          <Title title="Inscripciones" />
+        <Title title="Inscripciones" />
         <CreateInscripcion />
       </div>
 

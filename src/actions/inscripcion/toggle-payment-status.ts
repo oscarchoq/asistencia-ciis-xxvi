@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { sendEmailInscripcionIndividual } from "./send-email-individual";
+import { revalidatePath } from "next/cache";
 
 export const togglePaymentStatus = async (id_inscripcion: string) => {
   try {
@@ -55,6 +56,9 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
         warning: emailResult.message,
       };
     }
+
+    revalidatePath("/");
+    revalidatePath("/inscripcion", 'page');
 
     return {
       ok: true,
