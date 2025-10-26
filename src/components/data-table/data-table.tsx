@@ -145,47 +145,71 @@ export function DataTable<TData, TValue>({
           {/* Primera fila: Filtros y búsqueda */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div className="flex flex-col sm:flex-row flex-1 items-stretch sm:items-center gap-2">
-              {/* Filtros dinámicos (primero los combos) */}
+              {/* Filtros dinámicos (primero los combos y fechas) */}
               {filterConfigs && filterConfigs.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {filterConfigs.map((filter) => {
-                    const currentValue = searchParams.get(filter.column) || "RESET";
-                    const selectedOption = filter.options?.find(opt => opt.value === currentValue);
-                    const displayLabel = currentValue === "RESET" 
-                      ? "Todos" 
-                      : selectedOption?.label || currentValue;
+                    // Filtro tipo SELECT
+                    if (filter.type === "select") {
+                      const currentValue = searchParams.get(filter.column) || "RESET";
+                      const selectedOption = filter.options?.find(opt => opt.value === currentValue);
+                      const displayLabel = currentValue === "RESET" 
+                        ? "Todos" 
+                        : selectedOption?.label || currentValue;
+                      
+                      return (
+                        <div key={filter.column} className="flex flex-col gap-1 w-full sm:w-auto">
+                          <label className="text-xs font-medium text-muted-foreground px-1">
+                            {filter.label}
+                          </label>
+                          <Select
+                            value={currentValue}
+                            onValueChange={(value) => {
+                              if (value === "RESET") {
+                                updateURL(filter.column, "");
+                              } else {
+                                updateURL(filter.column, value);
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="h-9 w-full sm:w-[160px]">
+                              <SelectValue>
+                                <span>{displayLabel}</span>
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="RESET">Todos</SelectItem>
+                              {filter.options?.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    }
                     
-                    return (
-                      <div key={filter.column} className="flex flex-col gap-1 w-full sm:w-auto">
-                        <label className="text-xs font-medium text-muted-foreground px-1">
-                          {filter.label}
-                        </label>
-                        <Select
-                          value={currentValue}
-                          onValueChange={(value) => {
-                            if (value === "RESET") {
-                              updateURL(filter.column, "");
-                            } else {
-                              updateURL(filter.column, value);
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="h-9 w-full sm:w-[160px]">
-                            <SelectValue>
-                              <span>{displayLabel}</span>
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="RESET">Todos</SelectItem>
-                            {filter.options?.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    );
+                    // Filtro tipo DATE
+                    if (filter.type === "date") {
+                      const dateValue = searchParams.get(filter.column) || "";
+                      
+                      return (
+                        <div key={filter.column} className="flex flex-col gap-1 w-full sm:w-auto">
+                          <label className="text-xs font-medium text-muted-foreground px-1">
+                            {filter.label}
+                          </label>
+                          <Input
+                            type="date"
+                            value={dateValue}
+                            onChange={(e) => updateURL(filter.column, e.target.value)}
+                            className="h-9 w-full sm:w-[180px]"
+                          />
+                        </div>
+                      );
+                    }
+                    
+                    return null;
                   })}
                 </div>
               )}

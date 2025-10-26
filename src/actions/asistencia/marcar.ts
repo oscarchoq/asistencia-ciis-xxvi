@@ -3,6 +3,7 @@
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
 import { decryptBase64 } from "@/lib/base64-util";
+import { revalidatePath } from "next/cache";
 
 export const marcarAsistencia = async (codigoODocumento: string) => {
   try {
@@ -158,6 +159,10 @@ export const marcarAsistencia = async (codigoODocumento: string) => {
         activo: true,
       },
     });
+
+    // Invalidar caché de asistencias
+    revalidatePath('/asistencia/listar', 'page');
+    revalidatePath('/', 'page');
 
     return {
       ok: true,

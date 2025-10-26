@@ -1,7 +1,7 @@
 export * from './auth/login'
 export * from './auth/logout'
 
-export { getAsistencias } from './asistencia/get-asistencias'
+export { getAsistenciasPaginated } from './asistencia/get-asistencias'
 
 export { createEvento } from './evento/create-evento'
 export { getEventos } from './evento/get-eventos'

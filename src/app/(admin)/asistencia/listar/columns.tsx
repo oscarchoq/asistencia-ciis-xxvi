@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 export type Asistencia = {
   id_asistencia: string;
@@ -29,9 +28,7 @@ export type Asistencia = {
 export const columns: ColumnDef<Asistencia>[] = [
   {
     accessorKey: "inscripcion.nombres",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Participante" />
-    ),
+    header: "Participante",
     cell: ({ row }) => {
       const { nombres, apellidos } = row.original.inscripcion;
       return (
@@ -43,9 +40,7 @@ export const columns: ColumnDef<Asistencia>[] = [
   },
   {
     accessorKey: "inscripcion.numero_documento",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="N° Documento" />
-    ),
+    header: "N° Documento",
     cell: ({ row }) => {
       return (
         <div className="font-mono">
@@ -56,9 +51,7 @@ export const columns: ColumnDef<Asistencia>[] = [
   },
   {
     accessorKey: "evento.denominacion",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Evento" />
-    ),
+    header: "Evento",
     cell: ({ row }) => {
       return (
         <div className="max-w-xs truncate">
@@ -69,9 +62,7 @@ export const columns: ColumnDef<Asistencia>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Día" />
-    ),
+    header: "Día",
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as Date;
       return (
@@ -87,9 +78,7 @@ export const columns: ColumnDef<Asistencia>[] = [
   },
   {
     accessorKey: "hora_asistencia",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Hora Registro" />
-    ),
+    header: "Hora Registro",
     cell: ({ row }) => {
       const hora = row.getValue("hora_asistencia") as Date;
       return (
@@ -105,9 +94,7 @@ export const columns: ColumnDef<Asistencia>[] = [
   },
   {
     accessorKey: "registrado_por.name",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Registrado por" />
-    ),
+    header: "Registrado por",
     cell: ({ row }) => {
       return <div className="text-sm">{row.original.registrado_por.name}</div>;
     },
