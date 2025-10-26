@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
 type Kit = {
   id_kit: string;
@@ -20,9 +19,7 @@ type Kit = {
 export const columns: ColumnDef<Kit>[] = [
   {
     accessorKey: "inscripcion.nombres",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Participante" />
-    ),
+    header: "Participante",
     cell: ({ row }) => {
       const nombres = row.original.inscripcion.nombres;
       const apellidos = row.original.inscripcion.apellidos;
@@ -35,15 +32,11 @@ export const columns: ColumnDef<Kit>[] = [
   },
   {
     accessorKey: "inscripcion.numero_documento",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="N° Documento" />
-    ),
+    header: "N° Documento",
   },
   {
     accessorKey: "fecha_entrega",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Fecha Entrega" />
-    ),
+    header: "Fecha Entrega",
     cell: ({ row }) => {
       const fecha = new Date(row.getValue("fecha_entrega"));
       return (
@@ -59,9 +52,7 @@ export const columns: ColumnDef<Kit>[] = [
   },
   {
     accessorKey: "entregado_por",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Entregado por" />
-    ),
+    header: "Entregado por",
     cell: ({ row }) => {
       const usuario = row.original.entregado_por;
       return (

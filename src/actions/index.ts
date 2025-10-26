@@ -16,6 +16,7 @@ export { updateInscripcion } from './inscripcion/update-inscripcion'
 
 export { entregarKit } from './kit/entregar'
 export { getKits } from './kit/get-kits'
+export { getKitsPaginated } from './kit/get-kits-paginated'
 
 export { createUsuario } from './usuario/create-usuario'
 export { getUsuarios } from './usuario/get-usuarios'

@@ -3,6 +3,7 @@
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
 import { decryptBase64 } from "@/lib/base64-util";
+import { revalidatePath } from "next/cache";
 
 export const entregarKit = async (codigoEncriptado: string) => {
   try {
@@ -79,6 +80,10 @@ export const entregarKit = async (codigoEncriptado: string) => {
     });
 
     console.log(kit)
+
+    // Invalidar caché de kits
+    revalidatePath('/eventkit/listar', 'page');
+    revalidatePath('/', 'page');
 
     return {
       ok: true,
