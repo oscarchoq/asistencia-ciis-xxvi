@@ -2,12 +2,11 @@
 
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
+import { decryptBase64 } from "@/lib/base64-util";
 
-export const marcarAsistencia = async (numeroDocumento: string) => {
+export const marcarAsistencia = async (codigoODocumento: string) => {
   try {
     // Verificar que el usuario esté autenticado
-
-    console.log("Intentando marcar asistencia para documento:", numeroDocumento); // Debug
     const session = await auth();
     if (!session?.user?.id_usuario) {
       return {
@@ -16,18 +15,31 @@ export const marcarAsistencia = async (numeroDocumento: string) => {
       };
     }
 
-    // Validar que el número de documento no esté vacío
-    if (!numeroDocumento.trim()) {
+    // Validar que el código no esté vacío
+    if (!codigoODocumento.trim()) {
       return {
         ok: false,
-        message: "Debe proporcionar un número de documento válido",
+        message: "Debe proporcionar un código válido",
+      };
+    }
+
+    // Desencriptar el código (viene encriptado tanto del QR como del manual)
+    let numeroDocumento: string;
+    try {
+      numeroDocumento = decryptBase64(codigoODocumento.trim());
+      console.log("Código desencriptado:", numeroDocumento); // Debug
+    } catch (error) {
+      console.error("Error al desencriptar:", error);
+      return {
+        ok: false,
+        message: "Código inválido o corrupto",
       };
     }
 
     // Buscar la inscripción por número de documento
     const inscripcion = await prisma.inscripcion.findUnique({
       where: {
-        numero_documento: numeroDocumento.trim(),
+        numero_documento: numeroDocumento,
       },
     });
 
@@ -149,7 +161,7 @@ export const marcarAsistencia = async (numeroDocumento: string) => {
 
     return {
       ok: true,
-      message: `✅ Asistencia marcada exitosamente para ${inscripcion.nombres} ${inscripcion.apellidos} en el evento "${eventoEnCurso.denominacion}"`,
+      message: `Se registró la asistencia de ${inscripcion.nombres} ${inscripcion.apellidos} en el evento "${eventoEnCurso.denominacion}"`,
     };
   } catch (error) {
     console.error("Error al marcar asistencia:", error);
