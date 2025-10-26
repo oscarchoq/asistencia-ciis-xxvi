@@ -4,7 +4,7 @@ export * from './auth/logout'
 export { getAsistenciasPaginated } from './asistencia/get-asistencias'
 
 export { createEvento } from './evento/create-evento'
-export { getEventos } from './evento/get-eventos'
+export { getEventosPaginated } from './evento/get-eventos'
 export { updateEvento } from './evento/update-evento'
 
 export { createInscripcion } from './inscripcion/create-inscripcion'

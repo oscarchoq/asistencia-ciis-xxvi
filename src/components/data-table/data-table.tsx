@@ -41,6 +41,7 @@ interface DataTableProps<TData, TValue> {
   totalCount?: number;
   pageCount?: number;
   currentPage?: number;
+  showSearch?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -53,6 +54,7 @@ export function DataTable<TData, TValue>({
   totalCount,
   pageCount,
   currentPage,
+  showSearch = true,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -215,27 +217,29 @@ export function DataTable<TData, TValue>({
               )}
               
               {/* Búsqueda por documento con botón de lupa pegado (después de los combos) */}
-              <div className="flex flex-col gap-1 flex-1 sm:flex-none">
-                <label className="text-xs font-medium text-muted-foreground px-1">
-                  Buscador
-                </label>
-                <div className="flex items-center">
-                  <Input
-                    placeholder="Buscar por documento..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="h-9 rounded-r-none flex-1"
-                  />
-                  <Button
-                    onClick={handleSearch}
-                    size="sm"
-                    className="h-9 rounded-l-none px-3"
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
+              {showSearch && (
+                <div className="flex flex-col gap-1 flex-1 sm:flex-none">
+                  <label className="text-xs font-medium text-muted-foreground px-1">
+                    Buscador
+                  </label>
+                  <div className="flex items-center">
+                    <Input
+                      placeholder="Buscar por documento..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="h-9 rounded-r-none flex-1"
+                    />
+                    <Button
+                      onClick={handleSearch}
+                      size="sm"
+                      className="h-9 rounded-l-none px-3"
+                    >
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
               
               {/* Botón limpiar */}
               {(searchParams.get("documento") || Array.from(searchParams.keys()).some(key => key !== "page" && key !== "pageSize")) && (

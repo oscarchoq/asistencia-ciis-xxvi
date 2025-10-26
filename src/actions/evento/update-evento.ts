@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 interface UpdateEventoData {
   id_evento: string;
@@ -25,6 +26,10 @@ export const updateEvento = async (data: UpdateEventoData) => {
         activo: data.activo,
       },
     });
+
+    // Invalidar caché de eventos
+    revalidatePath('/evento', 'page');
+    revalidatePath('/', 'page');
 
     return {
       ok: true,

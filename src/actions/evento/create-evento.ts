@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 interface CreateEventoData {
   denominacion: string;
@@ -22,6 +23,10 @@ export const createEvento = async (data: CreateEventoData) => {
         hora_fin: data.hora_fin,
       },
     });
+
+    // Invalidar caché de eventos
+    revalidatePath('/evento', 'page');
+    revalidatePath('/', 'page');
 
     return {
       ok: true,
