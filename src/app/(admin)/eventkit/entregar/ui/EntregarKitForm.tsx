@@ -5,6 +5,7 @@ import { QrCodeIcon } from "lucide-react";
 import { entregarKit } from "@/actions";
 import Swal from "sweetalert2";
 import { QRScanner } from "./QRScanner";
+import { encryptBase64 } from "@/lib/base64-util";
 
 export default function EntregarKitForm() {
   const [showScanner, setShowScanner] = useState(false);
@@ -47,8 +48,6 @@ export default function EntregarKitForm() {
           html: `<p class="text-lg">${result.message}</p>`,
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#10b981",
-          timer: 3000,
-          timerProgressBar: true,
         });
         setManualCode(""); // Limpiar el input manual
       } else {
@@ -83,7 +82,9 @@ export default function EntregarKitForm() {
 
   // Handler para el registro manual
   const handleManualSubmit = async () => {
-    await handleEntregarKit(manualCode);
+    // Encriptar el código manual antes de enviar
+    const codigoEncriptado = encryptBase64(manualCode.trim());
+    await handleEntregarKit(codigoEncriptado);
   };
 
   // Handler para abrir el escáner QR
@@ -134,12 +135,12 @@ export default function EntregarKitForm() {
         {/* Sección de Ingreso Manual */}
         <div className={`flex flex-col justify-center gap-4 transition-opacity ${showScanner ? 'opacity-50' : 'opacity-100'}`}>
           <p className="text-lg font-bold leading-tight tracking-[-0.015em] text-[#141415] dark:text-neutral-50">
-            O ingrese el código manualmente
+            O ingrese manualmente
           </p>
           <div className="flex flex-col gap-4 sm:flex-row">
             <input
               className="form-input h-14 w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg border border-[#dadbdd] bg-white p-[15px] text-base font-normal leading-normal text-[#141415] placeholder:text-[#6e7277] focus:border-primary focus:outline-0 focus:ring-2 focus:ring-primary/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus:border-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="Ingrese su código de registro"
+              placeholder="Ingrese su número de documento"
               type="text"
               value={manualCode}
               onChange={(e) => setManualCode(e.target.value)}

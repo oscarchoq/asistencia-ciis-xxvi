@@ -2,8 +2,9 @@
 
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
+import { decryptBase64 } from "@/lib/base64-util";
 
-export const entregarKit = async (codigo: string) => {
+export const entregarKit = async (codigoEncriptado: string) => {
   try {
     // 1. Verificar autenticación
     const session = await auth();
@@ -14,21 +15,34 @@ export const entregarKit = async (codigo: string) => {
       };
     }
 
-    // 2. Buscar la inscripción por número de documento
+    // 2. Desencriptar el código
+    let numeroDocumento: string;
+    try {
+      numeroDocumento = decryptBase64(codigoEncriptado.trim());
+      console.log("Código desencriptado:", numeroDocumento);
+    } catch (error) {
+      console.error("Error al desencriptar:", error);
+      return {
+        ok: false,
+        message: "Código inválido o corrupto",
+      };
+    }
+
+    // 3. Buscar la inscripción por número de documento
     const inscripcion = await prisma.inscripcion.findUnique({
-      where: { numero_documento: codigo },
+      where: { numero_documento: numeroDocumento },
     });
 
     if (!inscripcion) {
       return {
         ok: false,
-        message: "Número de documento no válido o no encontrado",
+        message: `No se encontró ninguna inscripción con el documento: ${numeroDocumento}`,
       };
     }
 
     console.log(inscripcion)
 
-    // 3. Verificar que el pago esté validado
+    // 4. Verificar que el pago esté validado
     if (!inscripcion.pago_validado) {
       return {
         ok: false,
@@ -36,7 +50,7 @@ export const entregarKit = async (codigo: string) => {
       };
     }
 
-    // 4. Verificar si ya se entregó un kit
+    // 5. Verificar si ya se entregó un kit
     const kitExistente = await prisma.kit.findUnique({
       where: { id_inscripcion: inscripcion.id_inscripcion },
     });
@@ -55,7 +69,7 @@ export const entregarKit = async (codigo: string) => {
 
     console.log(kitExistente)
 
-    // 5. Registrar la entrega del kit
+    // 6. Registrar la entrega del kit
     const kit = await prisma.kit.create({
       data: {
         id_inscripcion: inscripcion.id_inscripcion,
