@@ -1,6 +1,7 @@
 import { columns } from "./columns";
 import { CreateInscripcion } from "./ui/CreateInscripcion";
 import { DataTable } from "@/components/data-table/data-table";
+import { DataTableWrapper } from "@/components/data-table/data-table-wrapper";
 import { FilterConfig } from "@/interfaces/data-table";
 import { getInscripcionesPaginated } from "@/actions";
 import { SyncButton } from "./ui/SyncButton";
@@ -87,15 +88,17 @@ export default async function InscripcionesPage({ searchParams }: InscripcionesP
         <CreateInscripcion />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={result.inscripciones}
-        customAction={<SyncButton />}
-        filterConfigs={filterConfigs}
-        totalCount={result.totalCount}
-        pageCount={result.pageCount}
-        currentPage={page}
-      />
+      <DataTableWrapper>
+        <DataTable
+          columns={columns}
+          data={result.inscripciones}
+          customAction={<SyncButton />}
+          filterConfigs={filterConfigs}
+          totalCount={result.totalCount}
+          pageCount={result.pageCount}
+          currentPage={page}
+        />
+      </DataTableWrapper>
     </div>
   );
 }
