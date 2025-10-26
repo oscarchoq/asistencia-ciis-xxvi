@@ -107,7 +107,7 @@ export function ImageViewer({
     if (!inscripcionData) return;
     
     setIsValidating(true);
-    toast.loading("Actualizando estado de pago...");
+    toast.loading("Validando pago y enviando correo...");
 
     try {
       const result = await togglePaymentStatus(inscripcionData.id_inscripcion);
@@ -115,18 +115,22 @@ export function ImageViewer({
       toast.dismiss();
 
       if (result.ok) {
-        toast.success(result.message || "Estado de pago actualizado");
+        if (result.warning) {
+          toast.warning(result.message || "Pago validado con advertencias");
+        } else {
+          toast.success(result.message || "Pago validado exitosamente");
+        }
         setOpenAlertPayment(false);
         if (onPaymentValidated) {
           onPaymentValidated();
         }
       } else {
-        toast.error(result.error || "Error al actualizar el estado de pago");
+        toast.error(result.error || "Error al validar el pago");
       }
     } catch (error) {
       toast.dismiss();
       console.error("Error:", error);
-      toast.error("Error inesperado al actualizar el estado de pago");
+      toast.error("Error inesperado al validar el pago");
     } finally {
       setIsValidating(false);
     }
@@ -203,9 +207,12 @@ export function ImageViewer({
       <AlertDialog open={openAlertPayment} onOpenChange={setOpenAlertPayment}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Validar pago?</AlertDialogTitle>
+            <AlertDialogTitle>¿Deseas validar el pago?</AlertDialogTitle>
             <AlertDialogDescription>
-              Estás a punto de validar el pago de {inscripcionData.nombres} {inscripcionData.apellidos}. Esta acción se puede revertir posteriormente.
+              Estás a punto de validar el pago de {inscripcionData.nombres}{" "}
+              {inscripcionData.apellidos}.
+              Una vez confirmado, se enviará automáticamente un correo de confirmación con el código QR.
+              Esta acción es definitiva y no puede deshacerse.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -217,7 +224,7 @@ export function ImageViewer({
               }}
               disabled={isValidating}
             >
-              {isValidating ? "Validando..." : "Validar Pago"}
+              {isValidating ? "Validando y enviando..." : "Validar y Enviar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

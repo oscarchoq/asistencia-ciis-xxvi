@@ -4,7 +4,7 @@ import { columns } from "./columns";
 import { getInscripciones } from "@/actions/inscripcion/get-inscripciones";
 import { SyncButton } from "./ui/SyncButton";
 import { CreateInscripcion } from "./ui/CreateInscripcion";
-import { SendEmailButton } from "./ui/SendEmailButton";
+// import { SendEmailButton } from "./ui/SendEmailButton";
 
 export default async function InscripcionesPage() {
   const { ok, inscripciones } = await getInscripciones();
@@ -21,24 +21,21 @@ export default async function InscripcionesPage() {
   }
 
   return (
-    <div className="">
-      <Title title="Inscripciones" />
-
-      <div className="flex justify-between items-center mb-5">
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <Title title="Inscripciones" />
         <CreateInscripcion />
       </div>
 
-      <div className="mb-10">
-        <DataTable
-          columns={columns}
-          data={inscripciones}
-          customAction={<SyncButton />}
-        />
-      </div>
-
-      <div className="flex justify-start">
+      {/* <div className="flex justify-start">
         <SendEmailButton inscripciones={inscripciones} />
-      </div>
+      </div> */}
+
+      <DataTable
+        columns={columns}
+        data={inscripciones}
+        customAction={<SyncButton />}
+      />
     </div>
   );
 }

@@ -30,7 +30,7 @@ const paymentMethodLabels: Record<PaymentMethod, string> = {
 
 // Mapeo de tipos de inscripción
 const inscriptionTypeLabels: Record<InscriptionType, string> = {
-  virtual: "Virtual",
+  virtual: "Formulario",
   presencial: "Presencial",
 };
 
@@ -44,15 +44,15 @@ export const columns: ColumnDef<Inscripcion>[] = [
       <div className="font-medium">{row.getValue("numero_documento")}</div>
     ),
   },
-  {
-    accessorKey: "correo",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Correo" />
-    ),
-    cell: ({ row }) => (
-      <div className="min-w-[150px]">{row.getValue("correo")}</div>
-    ),
-  },
+  // {
+  //   accessorKey: "correo",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Correo" />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <div className="min-w-[150px]">{row.getValue("correo")}</div>
+  //   ),
+  // },
   {
     accessorKey: "nombres",
     header: ({ column }) => (
@@ -91,18 +91,18 @@ export const columns: ColumnDef<Inscripcion>[] = [
     ),
     cell: ({ row }) => {
       const metodo = row.getValue("metodo_pago") as PaymentMethod;
-      return <span className="text-sm">{paymentMethodLabels[metodo]}</span>;
+      return <Badge variant="outline">{paymentMethodLabels[metodo]}</Badge>
     },
   },
   {
     accessorKey: "tipo_inscripcion",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tipo" />
+      <DataTableColumnHeader column={column} title="Tipo Inscripción" />
     ),
     cell: ({ row }) => {
       const tipo = row.getValue("tipo_inscripcion") as InscriptionType;
       return (
-        <Badge variant={tipo === "presencial" ? "default" : "secondary"}>
+        <Badge variant={tipo === "presencial" ? "presencial" : "formulario"}>
           {inscriptionTypeLabels[tipo]}
         </Badge>
       );
@@ -116,7 +116,7 @@ export const columns: ColumnDef<Inscripcion>[] = [
     cell: ({ row }) => {
       const validado = row.getValue("pago_validado") as boolean;
       return (
-        <Badge variant={validado ? "default" : "destructive"}>
+        <Badge variant={validado ? "validado" : "pendiente"}>
           {validado ? "Validado" : "Pendiente"}
         </Badge>
       );
@@ -135,18 +135,18 @@ export const columns: ColumnDef<Inscripcion>[] = [
       return <InscripcionActions inscripcion={inscripcion} />;
     },
   },
-  {
-    accessorKey: "email_enviado",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email Enviado" />
-    ),
-    cell: ({ row }) => {
-      const enviado = row.getValue("email_enviado") as boolean;
-      return (
-        <Badge variant={enviado ? "default" : "secondary"}>
-          {enviado ? "Enviado" : "No Enviado"}
-        </Badge>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "email_enviado",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Email Enviado" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const enviado = row.getValue("email_enviado") as boolean;
+  //     return (
+  //       <Badge variant={enviado ? "default" : "secondary"}>
+  //         {enviado ? "Enviado" : "No Enviado"}
+  //       </Badge>
+  //     );
+  //   },
+  // },
 ];

@@ -22,9 +22,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Inscripcion, PlanType } from "@prisma/client";
-import { MoreHorizontal, Pencil, CheckCircle, XCircle, Receipt, FileText } from "lucide-react";
+import { MoreHorizontal, Pencil, CheckCircle, Receipt, FileText, Mail } from "lucide-react";
 import { EditInscripcion } from "./EditInscripcion";
-import { togglePaymentStatus } from "@/actions";
+import { togglePaymentStatus, sendEmailInscripcionIndividual } from "@/actions";
 import { toast } from "sonner";
 import { ImageViewer } from "@/components/ui/image-viewer";
 
@@ -45,14 +45,16 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openAlertPayment, setOpenAlertPayment] = useState(false);
+  const [openAlertResendEmail, setOpenAlertResendEmail] = useState(false);
   const [openVoucherViewer, setOpenVoucherViewer] = useState(false);
   const [openMatriculaViewer, setOpenMatriculaViewer] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const pagoValidado = inscripcion.pago_validado;
 
   const handleTogglePayment = async () => {
     setIsLoading(true);
-    toast.loading("Actualizando estado de pago...");
+    toast.loading("Validando pago y enviando correo...");
 
     try {
       const result = await togglePaymentStatus(inscripcion.id_inscripcion);
@@ -60,18 +62,52 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
       toast.dismiss();
 
       if (result.ok) {
-        toast.success(result.message || "Estado de pago actualizado");
+        if (result.warning) {
+          toast.warning(result.message || "Pago validado con advertencias");
+        } else {
+          toast.success(result.message || "Pago validado exitosamente");
+        }
         setOpenAlertPayment(false);
         router.refresh();
       } else {
-        toast.error(result.error || "Error al actualizar el estado de pago");
+        toast.error(result.error || "Error al validar el pago");
       }
     } catch (error) {
       toast.dismiss();
       console.error("Error:", error);
-      toast.error("Error inesperado al actualizar el estado de pago");
+      toast.error("Error inesperado al validar el pago");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendEmail = async () => {
+    // Validar que el pago esté validado antes de reenviar
+    if (!inscripcion.pago_validado) {
+      toast.error("El pago no ha sido validado aún");
+      return;
+    }
+
+    setIsResending(true);
+    toast.loading("Reenviando correo de confirmación...");
+
+    try {
+      const result = await sendEmailInscripcionIndividual(inscripcion, false);
+
+      toast.dismiss();
+
+      if (result.ok) {
+        toast.success(result.message || "Correo reenviado exitosamente");
+        setOpenAlertResendEmail(false);
+      } else {
+        toast.error(result.message || "Error al reenviar el correo");
+      }
+    } catch (error) {
+      toast.dismiss();
+      console.error("Error:", error);
+      toast.error("Error inesperado al reenviar el correo");
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -95,18 +131,19 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
             onClick={() => {
               setOpenAlertPayment(true);
             }}
+            disabled={pagoValidado}
           >
-            {pagoValidado ? (
-              <>
-                <XCircle className="mr-2 h-4 w-4" />
-                Marcar como Pendiente
-              </>
-            ) : (
-              <>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Validar Pago
-              </>
-            )}
+            <CheckCircle className="mr-2 h-4 w-4" />
+            {pagoValidado ? "Pago Validado" : "Validar Pago"}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setOpenAlertResendEmail(true);
+            }}
+            disabled={!pagoValidado}
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            Reenviar Correo
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -143,13 +180,12 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
       <AlertDialog open={openAlertPayment} onOpenChange={setOpenAlertPayment}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {pagoValidado ? "¿Marcar pago como pendiente?" : "¿Validar pago?"}
-            </AlertDialogTitle>
+            <AlertDialogTitle>¿Deseas validar el pago?</AlertDialogTitle>
             <AlertDialogDescription>
-              {pagoValidado
-                ? `Estás a punto de marcar el pago de ${inscripcion.nombres} ${inscripcion.apellidos} como pendiente. Esta acción se puede revertir.`
-                : `Estás a punto de validar el pago de ${inscripcion.nombres} ${inscripcion.apellidos}. Esta acción se puede revertir.`}
+              Estás a punto de validar el pago de {inscripcion.nombres}{" "}
+              {inscripcion.apellidos}.
+              Una vez confirmado, se enviará automáticamente un correo de confirmación con el código QR.
+              Esta acción es definitiva y no puede deshacerse.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -161,7 +197,32 @@ export function InscripcionActions({ inscripcion }: InscripcionActionsProps) {
               }}
               disabled={isLoading}
             >
-              {isLoading ? "Procesando..." : "Continuar"}
+              {isLoading ? "Validando y enviando..." : "Validar y Enviar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={openAlertResendEmail} onOpenChange={setOpenAlertResendEmail}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Reenviar correo de confirmación?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Estás a punto de reenviar el correo de confirmación con el código QR a{" "}
+              <span className="font-semibold">{inscripcion.correo}</span> para{" "}
+              {inscripcion.nombres} {inscripcion.apellidos}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isResending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleResendEmail();
+              }}
+              disabled={isResending}
+            >
+              {isResending ? "Enviando..." : "Reenviar Correo"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

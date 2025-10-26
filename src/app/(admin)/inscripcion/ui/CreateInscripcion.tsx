@@ -27,6 +27,7 @@ import { createInscripcion } from "@/actions";
 import { toast } from "sonner";
 import { PlanType, PaymentMethod, InscriptionType } from '@prisma/client';
 import clsx from "clsx";
+import { Plus } from "lucide-react";
 
 interface FormData {
   correo: string;
@@ -150,7 +151,10 @@ export function CreateInscripcion() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="btn-primary">Nueva Inscripción</Button>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Nueva Inscripción
+        </Button>
       </DialogTrigger>
       <DialogContent
         className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
