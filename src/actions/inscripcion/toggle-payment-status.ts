@@ -3,9 +3,20 @@
 import prisma from "@/lib/prisma";
 import { sendEmailInscripcionIndividual } from "./send-email-individual";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth.config";
 
 export const togglePaymentStatus = async (id_inscripcion: string) => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        message: "Debe iniciar sesión para validar el pago",
+      }
+    }
+
     // Obtener la inscripción actual
     const inscripcion = await prisma.inscripcion.findUnique({
       where: {
@@ -28,6 +39,7 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
       };
     }
 
+    console.log(session.user.id_usuario)
     // Validar el pago
     const inscripcionActualizada = await prisma.inscripcion.update({
       where: {
@@ -36,6 +48,7 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
       data: {
         pago_validado: true,
         fecha_pago_validado: new Date(),
+        id_usuario: session.user.id_usuario,
       },
     });
 

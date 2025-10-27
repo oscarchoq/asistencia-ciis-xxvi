@@ -61,9 +61,11 @@ model Inscripcion {
   tipo_inscripcion    InscriptionType @default(virtual)
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
+  id_usuario          String?
 
-  Asistencia Asistencia[]
-  Kit        Kit[]
+  validado_por Usuario?      @relation(fields: [id_usuario], references: [id_usuario])
+  Asistencia   Asistencia[]
+  Kit          Kit[]
 }
 
 model Usuario {
@@ -75,8 +77,9 @@ model Usuario {
   activo     Boolean  @default(true)
   createdAt  DateTime @default(now())
 
-  Asistencia Asistencia[]
-  Kit        Kit[]
+  Asistencia  Asistencia[]
+  Inscripcion Inscripcion[]
+  Kit         Kit[]
 }
 
 model Evento {
