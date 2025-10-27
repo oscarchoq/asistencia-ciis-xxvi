@@ -22,12 +22,13 @@ import {
 import { createUsuario } from "@/actions";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import type { RoleType } from "@/interfaces";
 
 type FormData = {
   correo: string;
   password: string;
   name: string;
-  role: "administrador" | "organizador" | "asistencia";
+  role: RoleType;
 };
 
 export function CreateUsuario() {
@@ -192,6 +193,8 @@ export function CreateUsuario() {
                 <SelectItem value="administrador">Administrador</SelectItem>
                 <SelectItem value="organizador">Organizador</SelectItem>
                 <SelectItem value="asistencia">Asistencia</SelectItem>
+                <SelectItem value="kits">Kits</SelectItem>
+                <SelectItem value="recepcion">Recepción</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (

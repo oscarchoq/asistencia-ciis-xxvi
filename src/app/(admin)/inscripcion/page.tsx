@@ -8,6 +8,7 @@ import { FilterConfig } from "@/interfaces/data-table";
 import { getInscripcionesPaginated } from "@/actions";
 import { SyncButton } from "./ui/SyncButton";
 import { Title } from "@/components/ui/title/Title";
+import { checkModuleAccess } from "@/lib/auth-utils";
 
 // Configuración de filtros
 const filterConfigs: FilterConfig[] = [
@@ -44,6 +45,9 @@ interface InscripcionesPageProps {
 }
 
 export default async function InscripcionesPage({ searchParams }: InscripcionesPageProps) {
+  // Validar acceso al módulo
+  await checkModuleAccess('inscripcion');
+  
   const resolvedSearchParams = await searchParams;
 
   const page = Number(resolvedSearchParams.page) || 1;

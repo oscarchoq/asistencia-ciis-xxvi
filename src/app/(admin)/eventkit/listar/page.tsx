@@ -4,6 +4,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableWrapper } from "@/components/data-table/data-table-wrapper";
 import { FilterConfig } from "@/interfaces/data-table";
 import { columns } from "./columns";
+import { checkModuleAccess } from "@/lib/auth-utils";
 
 // Configuración de filtros
 const filterConfigs: FilterConfig[] = [
@@ -25,6 +26,9 @@ interface ListarKitsPageProps {
 }
 
 export default async function ListarKitsPage({ searchParams }: ListarKitsPageProps) {
+  // Validar acceso al módulo
+  await checkModuleAccess('eventkit');
+  
   const resolvedSearchParams = await searchParams;
 
   const page = Number(resolvedSearchParams.page) || 1;

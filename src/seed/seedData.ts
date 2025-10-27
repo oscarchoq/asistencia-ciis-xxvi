@@ -36,8 +36,26 @@ export const initialData: SeedData = {
     {
       correo: 'organizador@google.com',
       password: bcryptjs.hashSync('admin123'),
-      name: 'hola mundo',
+      name: 'Organizador',
       role: 'organizador',
+    },
+    {
+      correo: 'asistencia@google.com',
+      password: bcryptjs.hashSync('admin123'),
+      name: 'Asistencia',
+      role: 'asistencia',
+    },
+    {
+      correo: 'kits@google.com',
+      password: bcryptjs.hashSync('admin123'),
+      name: 'Kits',
+      role: 'kits',
+    },
+    {
+      correo: 'recepcion@google.com',
+      password: bcryptjs.hashSync('admin123'),
+      name: 'Recepción',
+      role: 'recepcion',
     },
   ],
   inscripciones: [

@@ -17,6 +17,8 @@ enum Role {
   administrador
   organizador
   asistencia
+  kits
+  recepcion
 }
 
 enum PaymentMethod {

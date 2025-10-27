@@ -26,6 +26,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { useSession } from 'next-auth/react'
+import { filterMenuByRole } from "@/lib/auth-utils"
+import type { RoleType } from "@/interfaces/enums"
 
 // This is sample data.
 const navMainData = [
@@ -85,8 +87,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const { data: session} = useSession()
 
+  // Obtener permisos del usuario
+  const userRole = (session?.user?.role as RoleType) || 'asistencia'
+  const permissions = filterMenuByRole(userRole)
+
+  // Filtrar el menú según los permisos del usuario
+  const filteredNavData = navMainData.filter((item) => {
+    if (item.url === '/') return permissions.home
+    if (item.url === '/asistencia') return permissions.asistencia
+    if (item.url === '/eventkit') return permissions.eventkit
+    if (item.url === '/inscripcion') return permissions.inscripcion
+    if (item.url === '/evento') return permissions.evento
+    if (item.url === '/usuario') return permissions.usuario
+    return false
+  })
+
   // Marcar como activo el item que coincida con la ruta actual
-  const navMainWithActive = navMainData.map((item) => ({
+  const navMainWithActive = filteredNavData.map((item) => ({
     ...item,
     isActive: pathname === item.url,
   }))

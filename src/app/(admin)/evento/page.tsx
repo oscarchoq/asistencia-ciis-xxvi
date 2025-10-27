@@ -5,6 +5,7 @@ import { FilterConfig } from "@/interfaces/data-table";
 import { columns } from "./columns";
 import { Title } from "@/components/ui/title/Title";
 import { CreateEvento } from "./ui/CreateEvento";
+import { checkModuleAccess } from "@/lib/auth-utils";
 
 // Configuración de filtros
 const filterConfigs: FilterConfig[] = [
@@ -25,6 +26,9 @@ interface EventoPageProps {
 }
 
 export default async function EventoPage({ searchParams }: EventoPageProps) {
+  // Validar acceso al módulo (solo administrador)
+  await checkModuleAccess('evento');
+  
   const resolvedSearchParams = await searchParams;
 
   const page = Number(resolvedSearchParams.page) || 1;

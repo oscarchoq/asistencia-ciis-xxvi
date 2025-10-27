@@ -4,12 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { UsuarioActions } from "./ui/UsuarioActions";
+import type { RoleType } from "@/interfaces";
 
 export type Usuario = {
   id_usuario: string;
   correo: string;
   name: string;
-  role: "administrador" | "organizador" | "asistencia";
+  role: RoleType;
   activo: boolean;
   createdAt: Date;
 };
@@ -18,12 +19,8 @@ const roleLabels: Record<string, string> = {
   administrador: "Administrador",
   organizador: "Organizador",
   asistencia: "Asistencia",
-};
-
-const roleVariants: Record<string, "default" | "secondary" | "outline"> = {
-  administrador: "default",
-  organizador: "secondary",
-  asistencia: "outline",
+  kits: "Kits",
+  recepcion: "Recepción",
 };
 
 export const columns: ColumnDef<Usuario>[] = [
@@ -53,7 +50,7 @@ export const columns: ColumnDef<Usuario>[] = [
     cell: ({ row }) => {
       const role = row.getValue("role") as string;
       return (
-        <Badge variant={roleVariants[role] || "default"}>
+        <Badge variant={"outline"}>
           {roleLabels[role] || role}
         </Badge>
       );
@@ -67,7 +64,7 @@ export const columns: ColumnDef<Usuario>[] = [
     cell: ({ row }) => {
       const activo = row.getValue("activo") as boolean;
       return (
-        <Badge variant={activo ? "default" : "secondary"}>
+        <Badge variant={activo ? "info" : "rechazado"}>
           {activo ? "Activo" : "Inactivo"}
         </Badge>
       );
@@ -80,9 +77,14 @@ export const columns: ColumnDef<Usuario>[] = [
     ),
     cell: ({ row }) => {
       const date = row.getValue("createdAt") as Date;
+      // Evitar problema de zona horaria
+      const dateString = new Date(date).toISOString().split('T')[0];
+      const [year, month, day] = dateString.split('-');
+      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+      
       return (
         <div className="text-sm">
-          {new Date(date).toLocaleDateString("es-PE")}
+          {localDate.toLocaleDateString("es-PE")}
         </div>
       );
     },

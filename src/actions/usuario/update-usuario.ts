@@ -1,10 +1,11 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import type { RoleType } from "@/interfaces";
 
 interface UpdateUsuarioData {
   id_usuario: string;
-  role: "administrador" | "organizador" | "asistencia";
+  role: RoleType;
   activo: boolean;
 }
 

@@ -3,12 +3,13 @@
 import prisma from "@/lib/prisma";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import bcrypt from "bcryptjs";
+import type { RoleType } from "@/interfaces";
 
 interface CreateUsuarioData {
   correo: string;
   password: string;
   name: string;
-  role: "administrador" | "organizador" | "asistencia";
+  role: RoleType;
 }
 
 export const createUsuario = async (data: CreateUsuarioData) => {

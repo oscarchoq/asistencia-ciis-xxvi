@@ -22,9 +22,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { updateUsuario } from "@/actions";
 import { toast } from "sonner";
+import type { RoleType } from "@/interfaces";
 
 type FormData = {
-  role: "administrador" | "organizador" | "asistencia";
+  role: RoleType;
   activo: boolean;
 };
 
@@ -33,7 +34,7 @@ interface EditUsuarioProps {
     id_usuario: string;
     correo: string;
     name: string;
-    role: "administrador" | "organizador" | "asistencia";
+    role: RoleType;
     activo: boolean;
   };
   open: boolean;
@@ -138,6 +139,8 @@ export function EditUsuario({ usuario, open, onOpenChange }: EditUsuarioProps) {
                 <SelectItem value="administrador">Administrador</SelectItem>
                 <SelectItem value="organizador">Organizador</SelectItem>
                 <SelectItem value="asistencia">Asistencia</SelectItem>
+                <SelectItem value="kits">Kits</SelectItem>
+                <SelectItem value="recepcion">Recepción</SelectItem>
               </SelectContent>
             </Select>
           </div>

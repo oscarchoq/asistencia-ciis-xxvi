@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditUsuario } from "./EditUsuario";
+import type { RoleType } from "@/interfaces";
 
 interface UsuarioActionsProps {
   usuario: {
     id_usuario: string;
     correo: string;
     name: string;
-    role: "administrador" | "organizador" | "asistencia";
+    role: RoleType;
     activo: boolean;
   };
 }

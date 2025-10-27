@@ -4,6 +4,7 @@ import { DataTableWrapper } from "@/components/data-table/data-table-wrapper";
 import { FilterConfig } from "@/interfaces/data-table";
 import { columns } from "./columns";
 import { Title } from "@/components/ui/title/Title";
+import { checkModuleAccess } from "@/lib/auth-utils";
 
 // Configuración de filtros
 const filterConfigs: FilterConfig[] = [
@@ -25,6 +26,9 @@ interface AsistenciaListarPageProps {
 }
 
 export default async function AsistenciaListarPage({ searchParams }: AsistenciaListarPageProps) {
+  // Validar acceso al módulo
+  await checkModuleAccess('asistencia');
+  
   const resolvedSearchParams = await searchParams;
 
   const page = Number(resolvedSearchParams.page) || 1;
