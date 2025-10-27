@@ -70,11 +70,14 @@ export const entregarKit = async (codigoEncriptado: string) => {
 
     console.log(kitExistente)
 
-    // 6. Registrar la entrega del kit
+    // 6. Registrar la entrega del kit con fecha local
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Lima" }));
+
     const kit = await prisma.kit.create({
       data: {
         id_inscripcion: inscripcion.id_inscripcion,
         entregado: true,
+        fecha_entrega: now, // Guardar fecha local (PostgreSQL @db.Date() guardará solo la fecha)
         id_usuario: session.user.id_usuario,
       },
     });

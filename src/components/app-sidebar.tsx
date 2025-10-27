@@ -109,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }))
 
   // Datos del usuario
-  console.log(session)
+  // console.log(session)
 
   const userData = {
   name: session?.user.name || 'Invitado',

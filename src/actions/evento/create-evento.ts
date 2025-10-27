@@ -13,6 +13,8 @@ interface CreateEventoData {
 
 export const createEvento = async (data: CreateEventoData) => {
   try {
+
+    console.log("data evento ==> ", data)
     // Crear evento
     const evento = await prisma.evento.create({
       data: {

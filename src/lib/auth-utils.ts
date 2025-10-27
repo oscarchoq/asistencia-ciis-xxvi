@@ -34,13 +34,13 @@ export async function checkModuleAccess(module: 'asistencia' | 'eventkit' | 'ins
       break;
       
     case 'eventkit':
-      if (userRole !== 'kits') {
+      if (userRole !== 'kits' && userRole !== 'organizador') {
         redirect('/');
       }
       break;
     
     case 'inscripcion':
-      if (userRole !== 'recepcion') {
+      if (userRole !== 'recepcion' && userRole !== 'organizador') {
         redirect('/');
       }
       break;
@@ -98,18 +98,21 @@ export function filterMenuByRole(userRole: RoleType) {
         ...allModules,
         eventkit: true,
         inscripcion: true,
+        evento: true,
       };
 
     case 'kits':
       // Permisos por definir - por ahora sin acceso
       return {
         ...allModules,
+        eventkit: true,
       };
 
     case 'recepcion':
       // Permisos por definir - por ahora sin acceso
       return {
         ...allModules,
+        inscripcion: true,
       };
 
     default:

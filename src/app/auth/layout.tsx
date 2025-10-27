@@ -8,7 +8,7 @@ export default async function AuthLayout({
 }) {
 
   const session = await auth()
-  console.log(session)
+  // console.log(session)
 
   if ( session?.user ) {
     redirect('/')

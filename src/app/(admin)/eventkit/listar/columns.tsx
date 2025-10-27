@@ -6,6 +6,7 @@ type Kit = {
   id_kit: string;
   entregado: boolean;
   fecha_entrega: Date;
+  createdAt: Date;
   inscripcion: {
     nombres: string;
     apellidos: string;
@@ -38,13 +39,33 @@ export const columns: ColumnDef<Kit>[] = [
     accessorKey: "fecha_entrega",
     header: "Fecha Entrega",
     cell: ({ row }) => {
-      const fecha = new Date(row.getValue("fecha_entrega"));
+      const fecha = row.getValue("fecha_entrega") as Date;
+      // Evitar problema de zona horaria
+      const dateString = new Date(fecha).toISOString().split('T')[0];
+      const [year, month, day] = dateString.split('-');
+      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+      
       return (
         <span>
-          {fecha.toLocaleDateString("es-PE", {
+          {localDate.toLocaleDateString("es-PE", {
             year: "numeric",
             month: "short",
             day: "numeric",
+          })}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Hora Entrega",
+    cell: ({ row }) => {
+      const createdAt = row.getValue("createdAt") as Date;
+      return (
+        <span className="text-sm text-muted-foreground">
+          {new Date(createdAt).toLocaleTimeString("es-PE", {
+            hour: "2-digit",
+            minute: "2-digit",
           })}
         </span>
       );
