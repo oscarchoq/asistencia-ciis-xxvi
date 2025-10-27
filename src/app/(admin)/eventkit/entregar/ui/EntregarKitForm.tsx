@@ -7,6 +7,16 @@ import Swal from "sweetalert2";
 import { QRScanner } from "./QRScanner";
 import { encryptBase64 } from "@/lib/base64-util";
 
+interface EntregarKitResult {
+  ok: boolean;
+  message: string;
+  inscripcion?: {
+    nombres: string;
+    apellidos: string;
+    documento: string;
+  };
+}
+
 export default function EntregarKitForm() {
   const [showScanner, setShowScanner] = useState(false);
   const [manualCode, setManualCode] = useState("");
@@ -39,22 +49,38 @@ export default function EntregarKitForm() {
     });
 
     try {
-      const result = await entregarKit(numeroDocumento);
+      const result: EntregarKitResult = await entregarKit(numeroDocumento);
       
       if (result.ok) {
+        // Construir mensaje con apellidos y nombres en negrita
+        const nombreCompleto = result.inscripcion 
+          ? `<p class="text-xl font-bold mt-2">${result.inscripcion.apellidos}, ${result.inscripcion.nombres}</p>`
+          : '';
+        
         await Swal.fire({
           icon: "success",
           title: "¡Kit Entregado!",
-          html: `<p class="text-lg">${result.message}</p>`,
+          html: `
+            <p class="text-lg">${result.message}</p>
+            ${nombreCompleto}
+          `,
           confirmButtonText: "Aceptar",
           confirmButtonColor: "#10b981",
         });
         setManualCode(""); // Limpiar el input manual
       } else {
+        // Mostrar nombre completo también en errores si está disponible
+        const nombreCompleto = result.inscripcion 
+          ? `<p class="text-lg font-bold mt-2">${result.inscripcion.apellidos}, ${result.inscripcion.nombres}</p>`
+          : '';
+        
         await Swal.fire({
           icon: "error",
           title: "No se pudo entregar",
-          html: `<p class="text-base">${result.message}</p>`,
+          html: `
+            <p class="text-base">${result.message}</p>
+            ${nombreCompleto}
+          `,
           confirmButtonText: "Entendido",
           confirmButtonColor: "#ef4444",
         });

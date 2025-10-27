@@ -4,8 +4,11 @@ import { initialData } from './seedData';
 async function main() {
   console.log("Seed database");
 
-  await prisma.usuario.deleteMany();
+  await prisma.asistencia.deleteMany();
+  await prisma.kit.deleteMany();
   await prisma.inscripcion.deleteMany();
+  await prisma.evento.deleteMany();
+  await prisma.usuario.deleteMany();
 
   const { users, inscripciones } = initialData;
 

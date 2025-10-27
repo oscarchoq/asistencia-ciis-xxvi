@@ -34,13 +34,23 @@ export async function checkModuleAccess(module: 'asistencia' | 'eventkit' | 'ins
       break;
       
     case 'eventkit':
+      if (userRole !== 'kits') {
+        redirect('/');
+      }
+      break;
+    
     case 'inscripcion':
-      if (userRole !== 'organizador') {
+      if (userRole !== 'recepcion') {
         redirect('/');
       }
       break;
       
     case 'evento':
+      if (userRole !== 'organizador') {
+        redirect('/');
+      }
+      break;
+
     case 'usuario':
       // Solo administrador puede acceder
       redirect('/');
