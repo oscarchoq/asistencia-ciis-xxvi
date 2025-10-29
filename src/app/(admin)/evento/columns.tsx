@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { EventoActions } from "./ui/EventoActions";
+import { formatDateLocal, extractTimeLocal } from "@/lib/date-util";
 
 export type Evento = {
   id_evento: string;
@@ -39,20 +40,19 @@ export const columns: ColumnDef<Evento>[] = [
     accessorKey: "fecha_evento",
     header: "Fecha",
     cell: ({ row }) => {
-      const date = row.getValue("fecha_evento") as Date;
-      // Convertir a string YYYY-MM-DD sin cambios de zona horaria
-      const dateString = new Date(date).toISOString().split('T')[0];
-      const [year, month, day] = dateString.split('-');
-      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+      const date = row.getValue("fecha_evento") as Date | string;
+      const fechaFormateada = formatDateLocal(date, 'long');
+      
+      // Obtener día de la semana manualmente
+      const dateStr = typeof date === 'string' ? date : date.toISOString();
+      const [year, month, day] = dateStr.split('T')[0].split('-');
+      const localDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const diaSemana = diasSemana[localDate.getDay()];
       
       return (
         <div className="text-sm">
-          {localDate.toLocaleDateString("es-PE", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
+          {diaSemana}, {fechaFormateada}
         </div>
       );
     },
@@ -61,13 +61,10 @@ export const columns: ColumnDef<Evento>[] = [
     accessorKey: "hora_inicio",
     header: "Hora Inicio",
     cell: ({ row }) => {
-      const time = row.getValue("hora_inicio") as Date;
+      const time = row.getValue("hora_inicio") as Date | string;
       return (
         <div className="text-sm">
-          {new Date(time).toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {extractTimeLocal(time)}
         </div>
       );
     },
@@ -76,13 +73,10 @@ export const columns: ColumnDef<Evento>[] = [
     accessorKey: "hora_fin",
     header: "Hora Fin",
     cell: ({ row }) => {
-      const time = row.getValue("hora_fin") as Date;
+      const time = row.getValue("hora_fin") as Date | string;
       return (
         <div className="text-sm">
-          {new Date(time).toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {extractTimeLocal(time)}
         </div>
       );
     },

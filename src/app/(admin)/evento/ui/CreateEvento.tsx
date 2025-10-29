@@ -20,9 +20,9 @@ import { Plus } from "lucide-react";
 type FormData = {
   denominacion: string;
   descripcion?: string;
-  fecha_evento: string;
-  hora_inicio: string;
-  hora_fin: string;
+  fecha_evento: string | Date;
+  hora_inicio: string | Date;
+  hora_fin: string | Date;
 };
 
 export function CreateEvento() {
@@ -38,27 +38,33 @@ export function CreateEvento() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
+    
+    // Validar que hora_fin sea mayor que hora_inicio
+    if (data.hora_fin <= data.hora_inicio) {
+      toast.error("La hora de fin debe ser mayor que la hora de inicio");
+      setIsLoading(false);
+      return;
+    }
+    
     toast.loading("Creando evento...");
 
     try {
-      // Construir las fechas y horas correctamente
-      const fecha_evento = new Date(data.fecha_evento);
+      // Construir strings ISO en hora local (sin conversión de zona horaria)
+      // Para fecha_evento: solo fecha sin hora
+      const fecha_evento_iso = `${data.fecha_evento}T00:00:00.000Z`;
       
-      // Crear objetos Date con la fecha y hora
-      const [horaInicioHoras, horaInicioMinutos] = data.hora_inicio.split(":");
-      const hora_inicio = new Date(data.fecha_evento);
-      hora_inicio.setHours(parseInt(horaInicioHoras), parseInt(horaInicioMinutos));
-
-      const [horaFinHoras, horaFinMinutos] = data.hora_fin.split(":");
-      const hora_fin = new Date(data.fecha_evento);
-      hora_fin.setHours(parseInt(horaFinHoras), parseInt(horaFinMinutos));
+      // Para hora_inicio: fecha + hora especificada
+      const hora_inicio_iso = `${data.fecha_evento}T${data.hora_inicio}:00.000Z`;
+      
+      // Para hora_fin: fecha + hora especificada
+      const hora_fin_iso = `${data.fecha_evento}T${data.hora_fin}:00.000Z`;
 
       const result = await createEvento({
         denominacion: data.denominacion,
         descripcion: data.descripcion,
-        fecha_evento,
-        hora_inicio,
-        hora_fin,
+        fecha_evento: fecha_evento_iso,
+        hora_inicio: hora_inicio_iso,
+        hora_fin: hora_fin_iso,
       });
 
       toast.dismiss();

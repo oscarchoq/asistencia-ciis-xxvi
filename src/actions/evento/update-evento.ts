@@ -7,14 +7,15 @@ interface UpdateEventoData {
   id_evento: string;
   denominacion: string;
   descripcion?: string;
-  fecha_evento: Date;
-  hora_inicio: Date;
-  hora_fin: Date;
+  fecha_evento: string | Date; // ISO string sin conversión de zona horaria
+  hora_inicio: string | Date;  // ISO string sin conversión de zona horaria
+  hora_fin: string | Date;     // ISO string sin conversión de zona horaria
   activo: boolean;
 }
 
 export const updateEvento = async (data: UpdateEventoData) => {
   try {
+    
     const evento = await prisma.evento.update({
       where: { id_evento: data.id_evento },
       data: {
