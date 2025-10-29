@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import { PlanType, PaymentMethod, InscriptionType, Semestre } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import { revalidatePath } from "next/cache";
 
@@ -17,6 +17,8 @@ interface CreateInscripcionInput {
   pais?: string;
   universidad?: string;
   observaciones?: string;
+  codigo_matricula?: string;
+  semestre?: Semestre;
 }
 
 export const createInscripcion = async (data: CreateInscripcionInput) => {
@@ -54,6 +56,8 @@ export const createInscripcion = async (data: CreateInscripcionInput) => {
         pais: data.pais?.trim() || undefined,
         universidad: data.universidad?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
+        codigo_matricula: data.codigo_matricula?.trim() || undefined,
+        semestre: data.semestre || undefined,
         pago_validado: false,
         email_enviado: false,
       },

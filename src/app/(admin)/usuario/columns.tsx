@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { UsuarioActions } from "./ui/UsuarioActions";
 import type { RoleType } from "@/interfaces";
+import { formatDateLocal } from "@/lib/date-util";
 
 export type Usuario = {
   id_usuario: string;
@@ -76,15 +77,10 @@ export const columns: ColumnDef<Usuario>[] = [
       <DataTableColumnHeader column={column} title="Fecha Creación" />
     ),
     cell: ({ row }) => {
-      const date = row.getValue("createdAt") as Date;
-      // Evitar problema de zona horaria
-      const dateString = new Date(date).toISOString().split('T')[0];
-      const [year, month, day] = dateString.split('-');
-      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
-      
+      const date = row.getValue("createdAt") as Date;      
       return (
         <div className="text-sm">
-          {localDate.toLocaleDateString("es-PE")}
+          {formatDateLocal(date, 'short')}
         </div>
       );
     },

@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { PlanType, PaymentMethod, InscriptionType } from '@prisma/client';
 import clsx from "clsx";
 import { Plus } from "lucide-react";
+import { SemestreType } from "@/interfaces";
+
 
 interface FormData {
   correo: string;
@@ -41,6 +43,8 @@ interface FormData {
   pais?: string;
   universidad?: string;
   observaciones?: string;
+  codigo_matricula?: string;
+  semestre?: SemestreType | "";
 }
 
 export function CreateInscripcion() {
@@ -68,12 +72,15 @@ export function CreateInscripcion() {
       pais: "",
       universidad: "",
       observaciones: "",
+      codigo_matricula: "",
+      semestre: "",
     },
   });
 
   const plan = watch("plan");
   const metodo_pago = watch("metodo_pago");
   const tipo_inscripcion = watch("tipo_inscripcion");
+  const semestre = watch("semestre");
 
   const onSubmit = async (data: FormData) => {
     // Validación adicional para los selects
@@ -124,6 +131,8 @@ export function CreateInscripcion() {
         pais: data.pais?.trim() || undefined,
         universidad: data.universidad?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
+        codigo_matricula: data.codigo_matricula?.trim() || undefined,
+        semestre: (data.semestre as SemestreType) || undefined,
       });
 
       toast.dismiss();
@@ -306,31 +315,7 @@ export function CreateInscripcion() {
               )}
             </div>
 
-            {/* Fila 4: País y Universidad */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="pais">País</Label>
-                <Input
-                  id="pais"
-                  placeholder="País de origen"
-                  className="w-full"
-                  autoComplete="country-name"
-                  {...register("pais")}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="universidad">Universidad</Label>
-                <Input
-                  id="universidad"
-                  placeholder="Universidad o institución"
-                  className="w-full"
-                  autoComplete="organization"
-                  {...register("universidad")}
-                />
-              </div>
-            </div>
-
-            {/* Fila 5: Plan, Tipo y Método de Pago */}
+            {/* Fila 4: Plan, Tipo y Método de Pago */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="tipo_inscripcion">
@@ -401,6 +386,72 @@ export function CreateInscripcion() {
                 </Select>
               </div>
             </div>
+
+            {/* Fila condicional: Código de Matrícula y Semestre (solo para estudianteesis) */}
+            {plan === "estudianteesis" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="codigo_matricula">
+                    Código de Matrícula <span className="text-muted-foreground text-xs">(Opcional)</span>
+                  </Label>
+                  <Input
+                    id="codigo_matricula"
+                    placeholder="Ingresa el código de matrícula"
+                    className="w-full"
+                    autoComplete="off"
+                    {...register("codigo_matricula")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="semestre">
+                    Semestre <span className="text-muted-foreground text-xs">(Opcional)</span>
+                  </Label>
+                  <Select
+                    value={semestre}
+                    onValueChange={(value) =>
+                      setValue("semestre", value as SemestreType, { shouldValidate: true })
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecciona semestre" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="segundo">Segundo</SelectItem>
+                      <SelectItem value="cuarto">Cuarto</SelectItem>
+                      <SelectItem value="sexto">Sexto</SelectItem>
+                      <SelectItem value="octavo">Octavo</SelectItem>
+                      <SelectItem value="decimo">Décimo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {/* Fila condicional: País y Universidad (NO se muestra para estudianteesis ni docenteesis) */}
+            {plan !== "estudianteesis" && plan !== "docenteesis" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="pais">País</Label>
+                  <Input
+                    id="pais"
+                    placeholder="País de origen"
+                    className="w-full"
+                    autoComplete="country-name"
+                    {...register("pais")}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="universidad">Universidad</Label>
+                  <Input
+                    id="universidad"
+                    placeholder="Universidad o institución"
+                    className="w-full"
+                    autoComplete="organization"
+                    {...register("universidad")}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Observaciones */}
             <div className="space-y-2">

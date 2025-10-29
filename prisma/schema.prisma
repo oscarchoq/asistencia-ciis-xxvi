@@ -41,6 +41,14 @@ enum InscriptionType {
   presencial
 }
 
+enum Semestre {
+  segundo
+  cuarto
+  sexto
+  octavo
+  decimo
+}
+
 model Inscripcion {
   id_inscripcion      String          @id @default(uuid())
   correo_formulario   String?
@@ -61,6 +69,8 @@ model Inscripcion {
   observaciones       String?
   email_enviado       Boolean         @default(false)
   tipo_inscripcion    InscriptionType @default(virtual)
+  codigo_matricula    String?
+  semestre            Semestre?
   createdAt           DateTime        @db.Timestamp(3) @default(dbgenerated("now()"))
   updatedAt           DateTime        @db.Timestamp(3) @updatedAt
   id_usuario          String?

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import { PlanType, PaymentMethod, InscriptionType, Semestre } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import { revalidatePath } from "next/cache";
 
@@ -18,6 +18,8 @@ interface UpdateInscripcionInput {
   pais?: string;
   universidad?: string;
   observaciones?: string;
+  codigo_matricula?: string;
+  semestre?: Semestre;
 }
 
 export const updateInscripcion = async (data: UpdateInscripcionInput) => {
@@ -74,6 +76,14 @@ export const updateInscripcion = async (data: UpdateInscripcionInput) => {
         pais: data.pais?.trim() || undefined,
         universidad: data.universidad?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
+        // Solo guardar codigo_matricula y semestre si el plan es estudianteesis
+        // Si cambia de plan, limpiar estos campos
+        codigo_matricula: data.plan === "estudianteesis" 
+          ? (data.codigo_matricula?.trim() || undefined)
+          : null,
+        semestre: data.plan === "estudianteesis" 
+          ? (data.semestre || undefined)
+          : null,
       },
     });
 
