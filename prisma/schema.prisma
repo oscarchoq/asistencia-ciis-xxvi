@@ -118,11 +118,11 @@ model Kit {
   id_kit         String   @id @default(uuid())
   id_inscripcion String
   entregado      Boolean  @default(false)
-  fecha_entrega  DateTime @default(now()) @db.Date()
+  fecha_entrega  DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date()
   observaciones  String?
   activo         Boolean  @default(true)
   id_usuario     String
-  createdAt      DateTime @default(now())
+  createdAt      DateTime @db.Timestamp(3) @default(dbgenerated("now()"))
 
   inscripcion   Inscripcion @relation(fields: [id_inscripcion], references: [id_inscripcion])
   entregado_por Usuario     @relation(fields: [id_usuario], references: [id_usuario])

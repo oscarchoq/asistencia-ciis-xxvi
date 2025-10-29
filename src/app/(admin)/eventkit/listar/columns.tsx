@@ -1,6 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { formatDateLocal, extractTimeLocal } from "@/lib/date-util";
 
 type Kit = {
   id_kit: string;
@@ -39,19 +40,10 @@ export const columns: ColumnDef<Kit>[] = [
     accessorKey: "fecha_entrega",
     header: "Fecha Entrega",
     cell: ({ row }) => {
-      const fecha = row.getValue("fecha_entrega") as Date;
-      // Evitar problema de zona horaria
-      const dateString = new Date(fecha).toISOString().split('T')[0];
-      const [year, month, day] = dateString.split('-');
-      const localDate = new Date(Number(year), Number(month) - 1, Number(day));
-      
+      const fecha = row.getValue("fecha_entrega") as string | Date;
       return (
         <span>
-          {localDate.toLocaleDateString("es-PE", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })}
+          {formatDateLocal(fecha, 'short')}
         </span>
       );
     },
@@ -60,13 +52,10 @@ export const columns: ColumnDef<Kit>[] = [
     accessorKey: "createdAt",
     header: "Hora Entrega",
     cell: ({ row }) => {
-      const createdAt = row.getValue("createdAt") as Date;
+      const createdAt = row.getValue("createdAt") as string | Date;
       return (
         <span className="text-sm text-muted-foreground">
-          {new Date(createdAt).toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {extractTimeLocal(createdAt)}
         </span>
       );
     },

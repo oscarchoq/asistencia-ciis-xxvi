@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Kit" ALTER COLUMN "fecha_entrega" SET DEFAULT CURRENT_DATE,
+ALTER COLUMN "createdAt" SET DEFAULT now();
