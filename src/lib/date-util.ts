@@ -12,6 +12,16 @@ export function getPeruDateTime(): Date {
 }
 
 /**
+ * Obtiene la hora actual en Perú en minutos desde medianoche
+ * Útil para comparar horarios de eventos
+ * @returns Número de minutos desde las 00:00 (0-1439)
+ */
+export function getPeruTimeInMinutes(): number {
+  const peruNow = getPeruDateTime();
+  return peruNow.getHours() * 60 + peruNow.getMinutes();
+}
+
+/**
  * Formatea una fecha sin conversión de zona horaria
  * @param date - Fecha en formato Date o string ISO
  * @param format - Formato deseado: 'short' (1 Ene. 2024), 'long' (1 Enero 2024), 'iso' (2024-01-01)
