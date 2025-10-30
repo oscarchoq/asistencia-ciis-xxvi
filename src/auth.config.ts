@@ -28,14 +28,31 @@ export const authConfig: NextAuthConfig = {
     //   return true;
     // },
 
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.data = user
       }
+      
+      // Validar que el usuario aún existe en la base de datos
+      if (token.data && (token.data as { id_usuario: string }).id_usuario) {
+        const userId = (token.data as { id_usuario: string }).id_usuario;
+        const userExists = await prisma.usuario.findUnique({
+          where: { 
+            id_usuario: userId,
+            activo: true 
+          }
+        });
+        
+        // Si el usuario no existe o no está activo, invalidar el token
+        if (!userExists) {
+          return null as never;
+        }
+      }
+      
       return token
     },
 
-    session({ session, token, user }) {
+    session({ session, token }) {
 
       session.user = token.data as never
       // console.log({ session, token, user })

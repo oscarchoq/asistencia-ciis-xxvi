@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import bcrypt from "bcryptjs";
 import type { RoleType } from "@/interfaces";
+import { auth } from "@/auth.config";
 
 interface CreateUsuarioData {
   correo: string;
@@ -14,6 +15,16 @@ interface CreateUsuarioData {
 
 export const createUsuario = async (data: CreateUsuarioData) => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        error: "No autorizado - Debe iniciar sesión",
+      };
+    }
+
     // Normalizar datos
     const normalizedEmail = normalizeEmail(data.correo);
     const normalizedName = capitalizeName(data.name);

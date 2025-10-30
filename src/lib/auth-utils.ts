@@ -14,11 +14,17 @@ import type { RoleType } from "@/interfaces/enums";
 export async function checkModuleAccess(module: 'asistencia' | 'eventkit' | 'inscripcion' | 'evento' | 'usuario') {
   const session = await auth();
   
+  // Si no hay sesión o el usuario no existe, redirigir al login
   if (!session?.user) {
     redirect('/auth/login');
   }
 
   const userRole = session.user.role as RoleType;
+  
+  // Si el rol no es válido, redirigir al login por seguridad
+  if (!userRole) {
+    redirect('/auth/login');
+  }
   
   // Administrador tiene acceso a todo
   if (userRole === 'administrador') {
@@ -28,7 +34,7 @@ export async function checkModuleAccess(module: 'asistencia' | 'eventkit' | 'ins
   // Validaciones específicas por rol
   switch (module) {
     case 'asistencia':
-      if (userRole !== 'asistencia') {
+      if (userRole !== 'asistencia' && userRole !== 'organizador') {
         redirect('/');
       }
       break;
@@ -93,9 +99,10 @@ export function filterMenuByRole(userRole: RoleType) {
       };
 
     case 'organizador':
-      // Solo puede ver eventkit e inscripcion
+      // Puede ver eventkit, inscripcion y asistencia
       return {
         ...allModules,
+        asistencia: true,
         eventkit: true,
         inscripcion: true,
         evento: true,

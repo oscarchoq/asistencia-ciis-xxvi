@@ -13,7 +13,7 @@ export const marcarAsistencia = async (codigoODocumento: string) => {
     if (!session?.user?.id_usuario) {
       return {
         ok: false,
-        message: "Debe iniciar sesión para marcar asistencia",
+        message: "No autorizado - Debe iniciar sesión",
       };
     }
 

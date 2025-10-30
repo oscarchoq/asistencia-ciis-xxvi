@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { PlanType, PaymentMethod, InscriptionType, Semestre } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth.config";
 
 interface CreateInscripcionInput {
   correo: string;
@@ -23,6 +24,16 @@ interface CreateInscripcionInput {
 
 export const createInscripcion = async (data: CreateInscripcionInput) => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        error: "No autorizado - Debe iniciar sesión",
+      };
+    }
+
     // Normalizar y capitalizar los datos
     const correoNormalizado = normalizeEmail(data.correo);
     const nombresCapitalizados = capitalizeName(data.nombres);

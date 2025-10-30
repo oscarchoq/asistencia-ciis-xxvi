@@ -7,12 +7,12 @@ import { revalidatePath } from "next/cache";
 
 export const entregarKit = async (codigoEncriptado: string) => {
   try {
-    // 1. Verificar autenticación
+    // Verificar que el usuario esté autenticado
     const session = await auth();
     if (!session?.user?.id_usuario) {
       return {
         ok: false,
-        message: "No autenticado",
+        message: "No autorizado - Debe iniciar sesión",
       };
     }
 

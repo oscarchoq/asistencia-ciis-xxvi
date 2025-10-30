@@ -13,8 +13,8 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
     if (!session?.user?.id_usuario) {
       return {
         ok: false,
-        message: "Debe iniciar sesión para validar el pago",
-      }
+        error: "No autorizado - Debe iniciar sesión",
+      };
     }
 
     // Obtener la inscripción actual
