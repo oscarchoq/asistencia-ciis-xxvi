@@ -1,5 +1,6 @@
 "use client";
 
+import { extractTimeLocal, formatDateLocal } from "@/lib/date-util";
 import { ColumnDef } from "@tanstack/react-table";
 
 export type Asistencia = {
@@ -61,17 +62,13 @@ export const columns: ColumnDef<Asistencia>[] = [
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "fecha_asistencia",
     header: "Día",
     cell: ({ row }) => {
-      const date = row.getValue("createdAt") as Date;
+      const date = row.getValue("fecha_asistencia") as string | Date;
       return (
         <div className="text-sm">
-          {new Date(date).toLocaleDateString("es-PE", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          })}
+          {formatDateLocal(date, 'short')}
         </div>
       );
     },
@@ -80,14 +77,10 @@ export const columns: ColumnDef<Asistencia>[] = [
     accessorKey: "hora_asistencia",
     header: "Hora Registro",
     cell: ({ row }) => {
-      const hora = row.getValue("hora_asistencia") as Date;
+      const hora = row.getValue("hora_asistencia") as string | Date;
       return (
-        <div className="font-mono text-sm">
-          {new Date(hora).toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          })}
+        <div className="text-sm">
+          {extractTimeLocal(hora)}
         </div>
       );
     },

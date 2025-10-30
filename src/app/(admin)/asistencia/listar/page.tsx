@@ -63,7 +63,7 @@ export default async function AsistenciaListarPage({ searchParams }: AsistenciaL
   }
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 mb-10">
       <div className="flex items-center justify-between">
         <Title title="Asistencias Registradas" />
       </div>

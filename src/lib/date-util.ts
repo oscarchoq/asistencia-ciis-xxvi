@@ -1,5 +1,17 @@
 
 /**
+ * Obtiene la fecha y hora actual en Perú (UTC-5)
+ * Siempre usa UTC como base y resta 5 horas, sin importar dónde esté desplegado
+ * @returns Date object con la hora peruana
+ */
+export function getPeruDateTime(): Date {
+  const now = new Date(); // Hora UTC del sistema
+  const utcTime = now.getTime(); // Timestamp UTC en milisegundos
+  const peruOffset = -5 * 60 * 60 * 1000; // -5 horas en milisegundos
+  return new Date(utcTime + peruOffset);
+}
+
+/**
  * Formatea una fecha sin conversión de zona horaria
  * @param date - Fecha en formato Date o string ISO
  * @param format - Formato deseado: 'short' (1 Ene. 2024), 'long' (1 Enero 2024), 'iso' (2024-01-01)

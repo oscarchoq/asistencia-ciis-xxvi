@@ -3,6 +3,7 @@
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
 import { decryptBase64 } from "@/lib/base64-util";
+import { getPeruDateTime, extractTimeLocal } from "@/lib/date-util";
 import { revalidatePath } from "next/cache";
 
 export const marcarAsistencia = async (codigoODocumento: string) => {
@@ -59,69 +60,40 @@ export const marcarAsistencia = async (codigoODocumento: string) => {
       };
     }
 
-    // Buscar eventos activos del día actual
-    const ahora = new Date();
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    
-    const mañana = new Date(hoy);
-    mañana.setDate(mañana.getDate() + 1);
+    console.log("DEBUG");
+    console.log(getPeruDateTime());
 
-    const eventosDelDia = await prisma.evento.findMany({
+    const eventoEnCurso = await prisma.evento.findFirst({
       where: {
         activo: true,
-        fecha_evento: {
-          gte: hoy,
-          lt: mañana,
-        },
-      },
-      orderBy: {
-        hora_inicio: 'asc',
-      },
-    });
-
-    if (eventosDelDia.length === 0) {
-      return {
-        ok: false,
-        message: "No hay ningún evento activo para el día de hoy",
-      };
-    }
-
-    // Buscar el evento que está en curso según la hora actual
-    const horaActual = ahora.getHours() * 60 + ahora.getMinutes(); // Convertir a minutos desde medianoche
-
-    let eventoEnCurso = null;
-
-    for (const evento of eventosDelDia) {
-      const horaInicio = new Date(evento.hora_inicio);
-      const horaFin = new Date(evento.hora_fin);
-      
-      const inicioMinutos = horaInicio.getHours() * 60 + horaInicio.getMinutes();
-      const finMinutos = horaFin.getHours() * 60 + horaFin.getMinutes();
-
-      // Verificar si la hora actual está dentro del rango del evento
-      if (horaActual >= inicioMinutos && horaActual <= finMinutos) {
-        eventoEnCurso = evento;
-        break;
+        fecha_evento: getPeruDateTime(),
+        hora_inicio: { lte: getPeruDateTime() },
+        hora_fin: { gte: getPeruDateTime() },
       }
-    }
+    })
 
+    console.log(eventoEnCurso)
+
+    // SI NO HAY EVENTO EN CURSO, BUSCAMOS EL PROXIMO EVENTO
     if (!eventoEnCurso) {
-      // Buscar el próximo evento
-      const proximoEvento = eventosDelDia.find((evento) => {
-        const horaInicio = new Date(evento.hora_inicio);
-        const inicioMinutos = horaInicio.getHours() * 60 + horaInicio.getMinutes();
-        return horaActual < inicioMinutos;
-      });
+      // Buscamos el proximo evento del día
+      const proximoEvento = await prisma.evento.findFirst({
+        where: {
+          activo: true,
+          fecha_evento: getPeruDateTime(),
+          hora_inicio: { gt: getPeruDateTime() },
+        },
+        orderBy: {
+          hora_inicio: 'asc'
+        }
+      })
+
+      console.log(proximoEvento)
 
       if (proximoEvento) {
-        const horaInicio = new Date(proximoEvento.hora_inicio);
         return {
           ok: false,
-          message: `No hay un evento en curso. El próximo evento "${proximoEvento.denominacion}" inicia a las ${horaInicio.toLocaleTimeString("es-PE", {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}`,
+          message: `No hay eventos en curso. Próximo: "${proximoEvento.denominacion}" - ${extractTimeLocal(proximoEvento.hora_inicio)}`,
         };
       }
 
@@ -148,15 +120,12 @@ export const marcarAsistencia = async (codigoODocumento: string) => {
       };
     }
 
-    // Registrar la asistencia
+    // Registrar la asistencia con fecha y hora de Perú
     await prisma.asistencia.create({
       data: {
         id_inscripcion: inscripcion.id_inscripcion,
         id_evento: eventoEnCurso.id_evento,
         id_usuario: session.user.id_usuario!,
-        fecha_asistencia: new Date(),
-        hora_asistencia: new Date(),
-        activo: true,
       },
     });
 
@@ -166,7 +135,7 @@ export const marcarAsistencia = async (codigoODocumento: string) => {
 
     return {
       ok: true,
-      message: `Se registró la asistencia de ${inscripcion.nombres} ${inscripcion.apellidos} en el evento "${eventoEnCurso.denominacion}"`,
+      message: `${inscripcion.nombres} ${inscripcion.apellidos}</br>Evento: ${eventoEnCurso.denominacion}`,
     };
   } catch (error) {
     console.error("Error al marcar asistencia:", error);
