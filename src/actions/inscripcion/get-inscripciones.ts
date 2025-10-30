@@ -44,7 +44,12 @@ export const getInscripcionesPaginated = async (params?: GetInscripcionesParams)
         where,
         skip,
         take: pageSize,
-        orderBy: { createdAt: "desc" },
+        orderBy: [
+          { createdAt: "desc" },
+          { numero_documento: "asc" },
+          { tipo_inscripcion: "asc" },
+          { pago_validado: "desc" },
+        ],
       }),
       prisma.inscripcion.count({ where }),
     ]);

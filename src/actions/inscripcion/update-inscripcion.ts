@@ -1,9 +1,10 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { PlanType, PaymentMethod, InscriptionType } from "@prisma/client";
+import { PlanType, PaymentMethod, InscriptionType, Semestre } from "@prisma/client";
 import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth.config";
 
 interface UpdateInscripcionInput {
   id_inscripcion: string;
@@ -18,10 +19,22 @@ interface UpdateInscripcionInput {
   pais?: string;
   universidad?: string;
   observaciones?: string;
+  codigo_matricula?: string;
+  semestre?: Semestre;
 }
 
 export const updateInscripcion = async (data: UpdateInscripcionInput) => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        error: "No autorizado - Debe iniciar sesión",
+      };
+    }
+
     // Normalizar y capitalizar los datos
     const correoNormalizado = normalizeEmail(data.correo);
     const nombresCapitalizados = capitalizeName(data.nombres);
@@ -74,6 +87,14 @@ export const updateInscripcion = async (data: UpdateInscripcionInput) => {
         pais: data.pais?.trim() || undefined,
         universidad: data.universidad?.trim() || undefined,
         observaciones: data.observaciones?.trim() || undefined,
+        // Solo guardar codigo_matricula y semestre si el plan es estudianteesis
+        // Si cambia de plan, limpiar estos campos
+        codigo_matricula: data.plan === "estudianteesis" 
+          ? (data.codigo_matricula?.trim() || undefined)
+          : null,
+        semestre: data.plan === "estudianteesis" 
+          ? (data.semestre || undefined)
+          : null,
       },
     });
 

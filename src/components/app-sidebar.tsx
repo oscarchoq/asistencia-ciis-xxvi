@@ -85,10 +85,84 @@ const navMainData = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
-  const { data: session} = useSession()
+  const { data: session, status } = useSession()
 
-  // Obtener permisos del usuario
-  const userRole = (session?.user?.role as RoleType) || 'asistencia'
+  // Si la sesión está cargando, mostrar skeleton mínimo
+  if (status === 'loading') {
+    return (
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="data-[slot=sidebar-menu-button]:!p-1.5"
+              >
+                <Link href="/">
+                  <Image
+                    src="https://img.freepik.com/vector-gratis/silueta-ave-fenix-diseno-plano_23-2150499724.jpg"
+                    alt="CIIS"
+                    width={25}
+                    height={25}
+                    className="!size-5"
+                  />
+                  <span className="text-base font-semibold">CIIS TACNA</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          {/* Loading skeleton - más discreto */}
+          <div className="px-3 py-2 space-y-1">
+            <div className="h-9 bg-sidebar-accent/50 rounded-md animate-pulse" />
+          </div>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    )
+  }
+
+  // Si no hay sesión, redirigir (esto no debería pasar por el layout)
+  if (!session?.user) {
+    return (
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="data-[slot=sidebar-menu-button]:!p-1.5"
+              >
+                <Link href="/">
+                  <Image
+                    src="https://img.freepik.com/vector-gratis/silueta-ave-fenix-diseno-plano_23-2150499724.jpg"
+                    alt="CIIS"
+                    width={25}
+                    height={25}
+                    className="!size-5"
+                  />
+                  <span className="text-base font-semibold">CIIS TACNA</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={[{
+            title: "Home",
+            url: "/",
+            icon: Home,
+            isActive: pathname === '/',
+          }]} />
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    )
+  }
+
+  // Obtener permisos del usuario (ahora sin fallback)
+  const userRole = session.user.role as RoleType
   const permissions = filterMenuByRole(userRole)
 
   // Filtrar el menú según los permisos del usuario
@@ -109,13 +183,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }))
 
   // Datos del usuario
-  // console.log(session)
-
   const userData = {
-  name: session?.user.name || 'Invitado',
-  email: session?.user.correo || '',
-  avatar: "https://img.freepik.com/psd-gratis/3d-ilustracion-persona-gafas_23-2149436190.jpg",
-}
+    name: session.user.name || 'Usuario',
+    email: session.user.correo || '',
+    avatar: "https://img.freepik.com/psd-gratis/3d-ilustracion-persona-gafas_23-2149436190.jpg",
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>

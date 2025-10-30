@@ -30,9 +30,10 @@ export const getEventosPaginated = async (params?: GetEventosParams) => {
         where,
         skip,
         take: pageSize,
-        orderBy: {
-          fecha_evento: "desc",
-        },
+        orderBy: [
+          { fecha_evento: "asc" },
+          { hora_inicio: "asc" },
+        ],
       }),
       prisma.evento.count({ where }),
     ]);

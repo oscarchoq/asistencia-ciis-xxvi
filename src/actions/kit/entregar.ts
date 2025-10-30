@@ -7,12 +7,12 @@ import { revalidatePath } from "next/cache";
 
 export const entregarKit = async (codigoEncriptado: string) => {
   try {
-    // 1. Verificar autenticación
+    // Verificar que el usuario esté autenticado
     const session = await auth();
     if (!session?.user?.id_usuario) {
       return {
         ok: false,
-        message: "No autenticado",
+        message: "No autorizado - Debe iniciar sesión",
       };
     }
 
@@ -71,13 +71,10 @@ export const entregarKit = async (codigoEncriptado: string) => {
     console.log(kitExistente)
 
     // 6. Registrar la entrega del kit con fecha local
-    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Lima" }));
-
     const kit = await prisma.kit.create({
       data: {
         id_inscripcion: inscripcion.id_inscripcion,
         entregado: true,
-        fecha_entrega: now, // Guardar fecha local (PostgreSQL @db.Date() guardará solo la fecha)
         id_usuario: session.user.id_usuario,
       },
     });

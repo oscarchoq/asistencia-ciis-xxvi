@@ -5,6 +5,7 @@ import { sendMail } from "@/config/nodemailer";
 import { generateQR } from "@/lib/qr-generator";
 import { loadTemplate } from "@/lib/template-loader";
 import { Inscripcion } from "@prisma/client";
+import { auth } from "@/auth.config";
 
 interface SendEmailIndividualResponse {
   ok: boolean;
@@ -23,6 +24,17 @@ export const sendEmailInscripcionIndividual = async (
   updateEmailStatus: boolean = true
 ): Promise<SendEmailIndividualResponse> => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        message: "No autorizado - Debe iniciar sesión",
+        error: "Unauthorized",
+      };
+    }
+
     // Validar que la inscripción tenga correo
     if (!inscripcion.correo) {
       return {

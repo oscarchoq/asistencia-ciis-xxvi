@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import type { RoleType } from "@/interfaces";
+import { auth } from "@/auth.config";
 
 interface UpdateUsuarioData {
   id_usuario: string;
@@ -11,6 +12,16 @@ interface UpdateUsuarioData {
 
 export const updateUsuario = async (data: UpdateUsuarioData) => {
   try {
+
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        message: "No autorizado - Debe iniciar sesión",
+      };
+    }
+
     const usuario = await prisma.usuario.update({
       where: { id_usuario: data.id_usuario },
       data: {

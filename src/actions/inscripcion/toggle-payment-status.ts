@@ -13,8 +13,8 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
     if (!session?.user?.id_usuario) {
       return {
         ok: false,
-        message: "Debe iniciar sesión para validar el pago",
-      }
+        error: "No autorizado - Debe iniciar sesión",
+      };
     }
 
     // Obtener la inscripción actual
@@ -47,10 +47,19 @@ export const togglePaymentStatus = async (id_inscripcion: string) => {
       },
       data: {
         pago_validado: true,
-        fecha_pago_validado: new Date(),
         id_usuario: session.user.id_usuario,
       },
     });
+
+    try {
+      await prisma.$executeRaw`
+        UPDATE "Inscripcion"
+        SET "fecha_pago_validado" = NOW()
+        WHERE "id_inscripcion" = ${id_inscripcion} AND "pago_validado" = true;
+      `;
+    } catch (error) {
+      console.warn("Error ignorado al actualizar fecha_pago_validado:", error);
+    }
 
     // Enviar email de confirmación
     const emailResult = await sendEmailInscripcionIndividual(

@@ -20,9 +20,9 @@ import { toast } from "sonner";
 type FormData = {
   denominacion: string;
   descripcion?: string;
-  fecha_evento: string;
-  hora_inicio: string;
-  hora_fin: string;
+  fecha_evento: string | Date;
+  hora_inicio: string | Date;
+  hora_fin: string | Date;
   activo: boolean;
 };
 
@@ -55,47 +55,62 @@ export function EditEvento({ evento, open, onOpenChange }: EditEventoProps) {
   const selectedActivo = watch("activo");
 
   useEffect(() => {
-    // Formatear las fechas para los inputs
-    const fechaEvento = new Date(evento.fecha_evento);
-    const horaInicio = new Date(evento.hora_inicio);
-    const horaFin = new Date(evento.hora_fin);
+    // Formatear las fechas para los inputs sin conversión de zona horaria
+    const fechaEventoStr = typeof evento.fecha_evento === 'string' 
+      ? evento.fecha_evento 
+      : evento.fecha_evento.toISOString();
+    const [yearFecha, monthFecha, dayFecha] = fechaEventoStr.split('T')[0].split('-');
+    
+    const horaInicioStr = typeof evento.hora_inicio === 'string'
+      ? evento.hora_inicio
+      : evento.hora_inicio.toISOString();
+    const horaInicioTime = horaInicioStr.split('T')[1].substring(0, 5);
+    
+    const horaFinStr = typeof evento.hora_fin === 'string'
+      ? evento.hora_fin
+      : evento.hora_fin.toISOString();
+    const horaFinTime = horaFinStr.split('T')[1].substring(0, 5);
 
     reset({
       denominacion: evento.denominacion,
       descripcion: evento.descripcion || "",
-      fecha_evento: fechaEvento.toISOString().split("T")[0],
-      hora_inicio: horaInicio.toTimeString().slice(0, 5),
-      hora_fin: horaFin.toTimeString().slice(0, 5),
+      fecha_evento: `${yearFecha}-${monthFecha}-${dayFecha}`,
+      hora_inicio: horaInicioTime,
+      hora_fin: horaFinTime,
       activo: evento.activo,
     });
   }, [evento, reset]);
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
+    
+    // Validar que hora_fin sea mayor que hora_inicio
+    if (data.hora_fin <= data.hora_inicio) {
+      toast.error("La hora de fin debe ser mayor que la hora de inicio");
+      setIsLoading(false);
+      return;
+    }
+    
     toast.loading("Actualizando evento...");
 
     try {
-      // Construir las fechas y horas correctamente
-      const fecha_evento = new Date(data.fecha_evento);
-
-      const [horaInicioHoras, horaInicioMinutos] = data.hora_inicio.split(":");
-      const hora_inicio = new Date(data.fecha_evento);
-      hora_inicio.setHours(
-        parseInt(horaInicioHoras),
-        parseInt(horaInicioMinutos)
-      );
-
-      const [horaFinHoras, horaFinMinutos] = data.hora_fin.split(":");
-      const hora_fin = new Date(data.fecha_evento);
-      hora_fin.setHours(parseInt(horaFinHoras), parseInt(horaFinMinutos));
+      // Construir strings ISO en hora local (sin conversión de zona horaria)
+      // Para fecha_evento: solo fecha sin hora
+      const fecha_evento_iso = `${data.fecha_evento}T00:00:00.000Z`;
+      
+      // Para hora_inicio: fecha + hora especificada
+      const hora_inicio_iso = `${data.fecha_evento}T${data.hora_inicio}:00.000Z`;
+      
+      // Para hora_fin: fecha + hora especificada
+      const hora_fin_iso = `${data.fecha_evento}T${data.hora_fin}:00.000Z`;
 
       const result = await updateEvento({
         id_evento: evento.id_evento,
         denominacion: data.denominacion,
         descripcion: data.descripcion,
-        fecha_evento,
-        hora_inicio,
-        hora_fin,
+        fecha_evento: fecha_evento_iso,
+        hora_inicio: hora_inicio_iso,
+        hora_fin: hora_fin_iso,
         activo: data.activo,
       });
 

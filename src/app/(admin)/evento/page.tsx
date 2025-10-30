@@ -59,7 +59,7 @@ export default async function EventoPage({ searchParams }: EventoPageProps) {
   }
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 mb-10">
       <div className="flex items-center justify-between">
         <Title title="Eventos" />
         <CreateEvento />
