@@ -195,8 +195,14 @@ export default function QRScanner({ onClose, onScanned }: QRScannerProps) {
             if (raw.trim()) { // Validar que el código no esté vacío
               drawDetected(raw, r.cornerPoints, r.boundingBox);
               detected = true;
+              // Detener el loop y la cámara
+              runningRef.current = false;
+              stopped = true;
+              if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
               // Llamar al callback con el código escaneado
               onScanned(raw);
+              // Detener la cámara
+              stopCamera();
             }
           }
         } catch {
@@ -224,8 +230,14 @@ export default function QRScanner({ onClose, onScanned }: QRScannerProps) {
               ]);
             else drawDetected(res.data);
             detected = true;
+            // Detener el loop y la cámara
+            runningRef.current = false;
+            stopped = true;
+            if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
             // Llamar al callback con el código escaneado
             onScanned(res.data);
+            // Detener la cámara
+            stopCamera();
           }
         } catch (e) {
           setError(
@@ -247,7 +259,7 @@ export default function QRScanner({ onClose, onScanned }: QRScannerProps) {
       runningRef.current = false;
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [stream, onScanned]);
+  }, [stream, onScanned, stopCamera]);
 
   useEffect(() => {
     const videoElement = videoRef.current;
