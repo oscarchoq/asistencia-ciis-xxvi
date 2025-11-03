@@ -16,6 +16,7 @@ export { getInscripcionesPaginated } from './inscripcion/get-inscripciones'
 export { sendEmailInscripcionIndividual } from './inscripcion/send-email-individual'
 export { togglePaymentStatus } from './inscripcion/toggle-payment-status'
 export { updateInscripcion } from './inscripcion/update-inscripcion'
+export { syncInscripciones } from './inscripcion/sync-inscripciones'
 
 export { entregarKit } from './kit/entregar'
 export { getKits } from './kit/get-kits'
