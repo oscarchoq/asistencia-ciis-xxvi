@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { updateEvento } from "@/actions";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   denominacion: string;
@@ -42,6 +43,7 @@ interface EditEventoProps {
 
 export function EditEvento({ evento, open, onOpenChange }: EditEventoProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -119,7 +121,8 @@ export function EditEvento({ evento, open, onOpenChange }: EditEventoProps) {
       if (result.ok) {
         toast.success(result.message || "Evento actualizado exitosamente");
         onOpenChange(false);
-        window.location.reload();
+        // window.location.reload();
+        router.refresh();
       } else {
         toast.error(result.error || "Error al actualizar evento");
       }

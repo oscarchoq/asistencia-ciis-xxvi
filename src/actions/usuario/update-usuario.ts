@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import type { RoleType } from "@/interfaces";
 import { auth } from "@/auth.config";
+import { revalidatePath } from "next/cache";
 
 interface UpdateUsuarioData {
   id_usuario: string;
@@ -29,6 +30,9 @@ export const updateUsuario = async (data: UpdateUsuarioData) => {
         activo: data.activo,
       },
     });
+
+    revalidatePath("/usuario", "page");
+    revalidatePath("/", "page");
 
     return {
       ok: true,

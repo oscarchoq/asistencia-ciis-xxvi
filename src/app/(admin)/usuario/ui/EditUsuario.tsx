@@ -23,6 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { updateUsuario } from "@/actions";
 import { toast } from "sonner";
 import type { RoleType } from "@/interfaces";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   role: RoleType;
@@ -43,6 +44,7 @@ interface EditUsuarioProps {
 
 export function EditUsuario({ usuario, open, onOpenChange }: EditUsuarioProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const { handleSubmit, setValue, watch, reset } = useForm<FormData>({
     defaultValues: {
@@ -77,7 +79,8 @@ export function EditUsuario({ usuario, open, onOpenChange }: EditUsuarioProps) {
       if (result.ok) {
         toast.success(result.message || "Usuario actualizado exitosamente");
         onOpenChange(false);
-        window.location.reload();
+        // window.location.reload();
+        router.refresh();
       } else {
         toast.error(result.error || "Error al actualizar usuario");
       }

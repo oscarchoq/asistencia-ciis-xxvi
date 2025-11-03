@@ -5,6 +5,7 @@ import { normalizeEmail, capitalizeName } from "@/lib/string-utils";
 import bcrypt from "bcryptjs";
 import type { RoleType } from "@/interfaces";
 import { auth } from "@/auth.config";
+import { revalidatePath } from "next/cache";
 
 interface CreateUsuarioData {
   correo: string;
@@ -53,6 +54,9 @@ export const createUsuario = async (data: CreateUsuarioData) => {
         role: data.role,
       },
     });
+
+    revalidatePath("/usuario", "page");
+    revalidatePath("/");
 
     return {
       ok: true,

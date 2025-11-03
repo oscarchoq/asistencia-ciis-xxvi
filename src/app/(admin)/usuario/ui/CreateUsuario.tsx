@@ -23,6 +23,7 @@ import { createUsuario } from "@/actions";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import type { RoleType } from "@/interfaces";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   correo: string;
@@ -34,6 +35,7 @@ type FormData = {
 export function CreateUsuario() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -63,7 +65,8 @@ export function CreateUsuario() {
         toast.success(result.message || "Usuario creado exitosamente");
         reset();
         setOpen(false);
-        window.location.reload();
+        // window.location.reload();
+        router.refresh();
       } else {
         toast.error(result.error || "Error al crear usuario");
       }

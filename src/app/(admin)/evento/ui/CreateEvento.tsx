@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { createEvento } from "@/actions";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   denominacion: string;
@@ -28,6 +29,7 @@ type FormData = {
 export function CreateEvento() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -73,7 +75,8 @@ export function CreateEvento() {
         toast.success(result.message || "Evento creado exitosamente");
         reset();
         setOpen(false);
-        window.location.reload();
+        // window.location.reload();
+        router.refresh();
       } else {
         toast.error(result.error || "Error al crear evento");
       }
