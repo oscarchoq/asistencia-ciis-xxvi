@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { auth} from '@/auth.config';
 
 export const syncInscripciones = async() => {
+
   const webhookUrl = process.env.WEBHOOK_URL;
   const webhookUser = process.env.WEBHOOK_USER;
   const webhookPass = process.env.WEBHOOK_PASS;
@@ -11,13 +13,22 @@ export const syncInscripciones = async() => {
     throw new Error("Configuración de webhook incompleta. Verifica las variables de entorno.");
   }
 
-  const auth = Buffer.from(`${webhookUser}:${webhookPass}`).toString('base64');
+  const authBasic = Buffer.from(`${webhookUser}:${webhookPass}`).toString('base64');
 
   try {
+    // Verificar que el usuario esté autenticado
+    const session = await auth();
+    if (!session?.user?.id_usuario) {
+      return {
+        ok: false,
+        message: "No autorizado - Debe iniciar sesión",
+      };
+    }
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
+        'Authorization': `Basic ${authBasic}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({}), // El webhook no espera nada
