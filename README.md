@@ -29,15 +29,20 @@ DATABASE_URL=
 
 # Environment variable for authentication secret
 AUTH_SECRET=
+
+# Environment variables for sync data
+WEBHOOK_URL=
+WEBHOOK_USER=
+WEBHOOK_PASS=
 ```
 
 ## production
 .env
 ```bash
 # Environment variables for email configuration
-EMAIL_HOST=""
-EMAIL_USER=""
-EMAIL_PASS=""
+EMAIL_HOST=
+EMAIL_USER=
+EMAIL_PASS=
 
 # Environment variables for database configuration
 DATABASE_URL=
@@ -47,10 +52,16 @@ AUTH_SECRET=
 NEXTAUTH_URL=
 NEXTAUTH_URL_INTERNAL=
 AUTH_TRUST_HOST=
+
+# Environment variables for sync data
+WEBHOOK_URL=
+WEBHOOK_USER=
+WEBHOOK_PASS=
 ```
 
 ## Docker
 ```bash
 docker build -t [NAME] .
 docker run -d --name [NAME] -p PORTEXTERNO:PORTINTERNO --env-file .env [NAME]
+docker run -d --name [NAME] -p PORTEXTERNO:PORTINTERNO --env-file .env -e TZ=America/Lima  [NAME]:[VERSION]
 ```
