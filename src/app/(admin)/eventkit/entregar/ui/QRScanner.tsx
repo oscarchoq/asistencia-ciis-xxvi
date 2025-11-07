@@ -194,6 +194,9 @@ export function QRScanner({ onClose, onScanned }: QRScannerProps) {
             const raw = r.rawValue ?? "";
             if (raw.trim()) {
               drawDetected(raw, r.cornerPoints, r.boundingBox);
+
+              stopCamera();
+
               detected = true;
               onScanned(raw);
             }
@@ -222,6 +225,7 @@ export function QRScanner({ onClose, onScanned }: QRScannerProps) {
                 loc.bottomLeftCorner,
               ]);
             else drawDetected(res.data);
+            stopCamera();
             detected = true;
             onScanned(res.data);
           }
@@ -245,7 +249,7 @@ export function QRScanner({ onClose, onScanned }: QRScannerProps) {
       runningRef.current = false;
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
     };
-  }, [stream, onScanned]);
+  }, [stream, onScanned, stopCamera]);
 
   useEffect(() => {
     const videoElement = videoRef.current;
